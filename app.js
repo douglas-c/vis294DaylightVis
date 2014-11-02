@@ -26,6 +26,11 @@ dataFormat = function(d) {
     };
 }
 
+ /********** Brush callback **********/
+brushed = function() {
+    console.log("brush");
+}
+
  /********** Graph callback **********/
 var currentGraph = "";
 graphCallback = function(error, data) {
@@ -38,28 +43,6 @@ graphCallback = function(error, data) {
         .attr("height", 200 )
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-    // brush selection logic. { temporarily disabled }
-
-    // var brush1 = d3.svg.brush()
-    //     .x(d3.scale.identity().domain([0, width/2]))
-    //     .y(d3.scale.identity().domain([0, height]))
-    //     .extent([[100, 100], [200, 200]])
-    //     .on("brush", brushed1);
-
-    // var brush2 = d3.svg.brush()
-    //     .x(d3.scale.identity().domain([width/2, width]))
-    //     .y(d3.scale.identity().domain([0, height]))
-    //     .extent([[400, 400], [500, 500]])
-    //     .on("brush", brushed2);
-
-    // svg.append("g")
-    //     .attr("class", "brush")
-    //     .call(brush1);
-
-    // svg.append("g")
-    //     .attr("class", "brush")
-    //     .call(brush2);
 
     var dayLabels = svg.selectAll(".dayLabel")
         .data(days)
@@ -115,7 +98,31 @@ graphCallback = function(error, data) {
         .text(function(d) { return "≥ " + Math.round(d); })
         .attr("x", function(d, i) { return legendElementWidth * i; })
         .attr("y", height-320 + gridSize);
-}
+
+    // brush selection logic.
+    function brushed1() {
+        var extent = heatmapBrush1.extent();
+        heatMap.each(function(d) {
+            console.log(arguments);
+        });
+        // point.each(function(d) { d.scanned = d.selected = false; });
+        // search(quadtree, extent[0][0], extent[0][1], extent[1][0], extent[1][1]);
+        // point.classed("scanned", function(d) { return d.scanned; });
+        // point.classed("selected", function(d) { return d.selected; });
+        // brushed2.x=brushed1.x+400;
+        // brushed2.y=brushed1.y;
+    }
+
+    var heatmapBrush1 = d3.svg.brush()
+        .x(d3.scale.identity().domain([0, width]))
+        .y(d3.scale.identity().domain([0, height/2]))
+        .extent([[100, 100], [200, 200]])
+        .on("brush", brushed1);
+
+    svg.append("g")
+        .attr("class", "heatmapbrush")
+        .call(heatmapBrush1);
+    }
 
  /** Heatmap 1 ************************************/
 var currentGraph = "#chart1";
@@ -125,3 +132,5 @@ d3.csv("data.csv", dataFormat, graphCallback);
 var currentGraph = "#chart2";
 d3.csv("data.csv", dataFormat, graphCallback);
 
+ /** Untested stuff that's cluttering the global namespace. ************************************/
+var width = 500,    height = 480;
