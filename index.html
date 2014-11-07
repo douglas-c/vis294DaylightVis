@@ -36,19 +36,29 @@
             stroke: #ccc;
             shape-rendering: crispEdges;
             }
-
-            .heatmapbrush .extent {
+            .extent {
             stroke: #ff0000;
             fill-opacity: .125;
             shape-rendering: crispEdges;
+            }
+            #chart {
+                width: 1000px;
+                margin: 0 auto 0 auto;
+                border-bottom: 1px solid #000000;
+            }
+            #lists {
+                width: 1000px;
+                margin: 0 auto 0 auto;
             }
         </style>
         <script src="http://d3js.org/d3.v3.js" type="text/javascript"></script>
         <script src="app.js" type="text/javascript"></script>
     </head>
     <body>
-        <div id="chart1"></div>
-        <div id="chart2"></div>
-        <div id="chart3"></div>
+        <div id="chart"></div>
+        <div id="lists">
+            <div id="list1"></div>
+            <div id="list2"></div>
+        </div>
     </body>
 </html>

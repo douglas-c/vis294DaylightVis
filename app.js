@@ -26,25 +26,9 @@ dataFormat = function(d) {
     };
 }
 
- /********** Brush callback **********/
-brushed = function() {
-    console.log("brush");
-}
-
- /********** Graph callback **********/
-var currentGraph = "";
-graphCallback = function(error, data) {
-    var colorScale = d3.scale.quantile()
-        .domain([0, buckets - 1, d3.max(data, function (d) { return d.value; })])
-        .range(colors);
-
-    var svg = d3.select(currentGraph).append("svg")
-        .attr("width", 500 )
-        .attr("height", 200 )
-        .append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-    var dayLabels = svg.selectAll(".dayLabel")
+ /********** Graph Annotation **********/
+graphAnnotate = function(rootSvg, colorScale) {
+    var dayLabels = rootSvg.selectAll(".dayLabel")
         .data(days)
         .enter().append("text")
         .text(function (d) { return d; })
@@ -54,7 +38,7 @@ graphCallback = function(error, data) {
         .attr("transform", "translate(-6," + gridSize / 1.5 + ")")
         .attr("class", function (d, i) { return ((i >= 0 && i <= 4) ? "dayLabel mono axis axis-workweek" : "dayLabel mono axis"); });
 
-    var timeLabels = svg.selectAll(".timeLabel")
+    var timeLabels = rootSvg.selectAll(".timeLabel")
         .data(times)
         .enter().append("text")
         .text(function(d) { return d; })
@@ -63,6 +47,38 @@ graphCallback = function(error, data) {
         .style("text-anchor", "middle")
         .attr("transform", "translate(" + gridSize / 2 + ", -6)")
         .attr("class", function(d, i) { return ((i >= 7 && i <= 16) ? "timeLabel mono axis axis-worktime" : "timeLabel mono axis"); });
+
+    var legend = rootSvg.selectAll(".legend")
+        .data([0].concat(colorScale.quantiles()), function(d) { return d; })
+        .enter().append("g")
+        .attr("class", "legend");
+
+    legend.append("rect")
+        .attr("x", function(d, i) { return legendElementWidth * i; })
+        .attr("y", height-320)
+        .attr("width", legendElementWidth)
+        .attr("height", gridSize / 2)
+        .style("fill", function(d, i) { return colors[i]; });
+
+    legend.append("text")
+        .attr("class", "mono")
+        .text(function(d) { return "≥ " + Math.round(d); })
+        .attr("x", function(d, i) { return legendElementWidth * i; })
+        .attr("y", height-320 + gridSize);
+
+}
+
+ /********** Graph callback **********/
+graphCallbackOne = function(error, data) {
+    var colorScale = d3.scale.quantile()
+        .domain([0, buckets - 1, d3.max(data, function (d) { return d.value; })])
+        .range(colors);
+
+    var svg = d3.select("#chart").append("svg")
+        .attr("width", 500 )
+        .attr("height", 200 )
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     var heatMap = svg.selectAll(".hour")
         .data(data)
@@ -81,56 +97,83 @@ graphCallback = function(error, data) {
 
     heatMap.append("title").text(function(d) { return d.value; });
 
-    var legend = svg.selectAll(".legend")
-        .data([0].concat(colorScale.quantiles()), function(d) { return d; })
-        .enter().append("g")
-        .attr("class", "legend");
-
-    legend.append("rect")
-        .attr("x", function(d, i) { return legendElementWidth * i; })
-        .attr("y", height-320)
-        .attr("width", legendElementWidth)
-        .attr("height", gridSize / 2)
-        .style("fill", function(d, i) { return colors[i]; });
-
-    legend.append("text")
-        .attr("class", "mono")
-        .text(function(d) { return "≥ " + Math.round(d); })
-        .attr("x", function(d, i) { return legendElementWidth * i; })
-        .attr("y", height-320 + gridSize);
+    graphAnnotate(svg, colorScale);
 
     // brush selection logic.
     function brushed1() {
+        if (!d3.event.sourceEvent) return;
         var extent = heatmapBrush1.extent();
-        heatMap.each(function(d) {
-            console.log(arguments);
-        });
-        // point.each(function(d) { d.scanned = d.selected = false; });
-        // search(quadtree, extent[0][0], extent[0][1], extent[1][0], extent[1][1]);
-        // point.classed("scanned", function(d) { return d.scanned; });
-        // point.classed("selected", function(d) { return d.selected; });
-        // brushed2.x=brushed1.x+400;
-        // brushed2.y=brushed1.y;
+        d3.select('.heatmapbrush2').transition()
+            .call(heatmapBrush2.extent(extent))
+            .call(heatmapBrush2.event);
     }
 
-    var heatmapBrush1 = d3.svg.brush()
+    heatmapBrush1 = d3.svg.brush()
         .x(d3.scale.identity().domain([0, width]))
         .y(d3.scale.identity().domain([0, height/2]))
         .extent([[100, 100], [200, 200]])
-        .on("brush", brushed1);
+        .on("brushend", brushed1);
 
     svg.append("g")
-        .attr("class", "heatmapbrush")
+        .attr("class", "heatmapbrush1")
         .call(heatmapBrush1);
+}
+
+graphCallbackTwo = function(error, data) {
+    var colorScale = d3.scale.quantile()
+        .domain([0, buckets - 1, d3.max(data, function (d) { return d.value; })])
+        .range(colors);
+
+    var svg = d3.select("#chart").append("svg")
+        .attr("width", 500 )
+        .attr("height", 200 )
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    var heatMap = svg.selectAll(".hour")
+        .data(data)
+        .enter().append("rect")
+        .attr("x", function(d) { return (d.hour - 1) * gridSize; })
+        .attr("y", function(d) { return (d.day - 1) * gridSize; })
+        .attr("rx", 4)
+        .attr("ry", 4)
+        .attr("class", "hour bordered")
+        .attr("width", gridSize)
+        .attr("height", gridSize)
+        .style("fill", colors[0]);
+
+    heatMap.transition().duration(1000)
+        .style("fill", function(d) { return colorScale(d.value); });
+
+    heatMap.append("title").text(function(d) { return d.value; });
+
+    graphAnnotate(svg, colorScale);
+
+    // brush selection logic.
+    function brushed2() {
+        if (!d3.event.sourceEvent) return;
+        var extent = heatmapBrush2.extent();
+        d3.select('.heatmapbrush1').transition()
+            .call(heatmapBrush1.extent(extent))
+            .call(heatmapBrush1.event);
     }
 
+    heatmapBrush2 = d3.svg.brush()
+        .x(d3.scale.identity().domain([0, width]))
+        .y(d3.scale.identity().domain([0, height/2]))
+        .extent([[100, 100], [200, 200]])
+        .on("brushend", brushed2);
+
+    svg.append("g")
+        .attr("class", "heatmapbrush2")
+        .call(heatmapBrush2);
+}
+
  /** Heatmap 1 ************************************/
-var currentGraph = "#chart1";
-d3.csv("data.csv", dataFormat, graphCallback);
+d3.csv("data.csv", dataFormat, graphCallbackOne);
 
  /** Heatmap 2 ************************************/
-var currentGraph = "#chart2";
-d3.csv("data.csv", dataFormat, graphCallback);
+d3.csv("data.csv", dataFormat, graphCallbackTwo);
 
  /** Untested stuff that's cluttering the global namespace. ************************************/
 var width = 500,    height = 480;
