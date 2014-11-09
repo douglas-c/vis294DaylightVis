@@ -1,64 +1,66 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <html>
-    <head>
-        <style type="text/css">
-            rect.bordered {
-            stroke: #E6E6E6;
-            stroke-width:2px;
-            }
-            text.mono {
-            font-size: 9pt;
-            font-family: Consolas, courier;
-            fill: #aaa;
-            }
-            text.axis-workweek {
-            fill: #000;
-            }
-            text.axis-worktime {
-            fill: #000;
-            }
-            .point {
-            fill: #999;
-            stroke: #fff;
-            }
-            .point.scanned {
-            fill: orange;
-            fill-opacity: 1;
-            stroke: brown;
-            }
-            .point.selected {
-            fill: red;
-            fill-opacity: 1;
-            }
-            .node {
-            fill: none;
-            stroke: #ccc;
-            shape-rendering: crispEdges;
-            }
-            .extent {
-            stroke: #ff0000;
-            fill-opacity: .125;
-            shape-rendering: crispEdges;
-            }
-            #chart {
-                width: 1000px;
-                margin: 0 auto 0 auto;
-                border-bottom: 1px solid #000000;
-            }
-            #lists {
-                width: 1000px;
-                margin: 0 auto 0 auto;
-            }
-        </style>
-        <script src="http://d3js.org/d3.v3.js" type="text/javascript"></script>
-        <script src="app.js" type="text/javascript"></script>
-    </head>
-    <body>
-        <div id="chart"></div>
-        <div id="lists">
-            <div id="list1"></div>
-            <div id="list2"></div>
-        </div>
-    </body>
+	<head>
+		<style type="text/css">
+			rect.bordered {
+			stroke: #E6E6E6;
+			stroke-width:1px;
+			}
+			text.mono {
+			font-size: 9pt;
+			font-family:  "Trebuchet MS", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Tahoma, sans-serif;, courier;
+			fill: #aaa;
+			}
+			text.axis-workweek {
+			fill: #000;
+			}
+			text.axis-worktime {
+			fill: #000;
+			}
+			.point {
+			fill: #999;
+			stroke: #fff;
+			}
+			.point.scanned {
+			fill: orange;
+			fill-opacity: 1;
+			stroke: brown;
+			}
+			.point.selected {
+			fill: red;
+			fill-opacity: 5;
+			}
+			.node {
+			fill: none;
+			stroke: #ccc;
+			shape-rendering: crispEdges;
+			}
+			.extent {
+			stroke: #ff0000;
+			fill-opacity: .125;
+			shape-rendering: crispEdges;
+			}
+			#chart {
+				width: 1000px;
+				margin: 0 auto 0 auto;
+				border-bottom: 1px solid #000000;
+			}
+			#lists {
+				width: 1000px;
+				margin: 0 auto 0 auto;
+			}
+		</style>
+		<script src="http://d3js.org/d3.v3.js" type="text/javascript"></script>
+		<script src="app.js" type="text/javascript"></script>
+	</head>
+	<body>
+		<div id="chart"></div>
+		<div id="lists">
+			Values from Heatmap 1
+			<div id="list1"></div><br>
+			Values from Heatmap 2
+			<div id="list2"></div>
+		</div>
+	</body>
 </html>
