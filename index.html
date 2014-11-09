@@ -18,18 +18,11 @@
             text.axis-worktime {
             fill: #000;
             }
-            .point {
-            fill: #999;
-            stroke: #fff;
+            .hour {
+                opacity: 0.4;
             }
-            .point.scanned {
-            fill: orange;
-            fill-opacity: 1;
-            stroke: brown;
-            }
-            .point.selected {
-            fill: red;
-            fill-opacity: 1;
+            .selected {
+            opacity: 1.0 !important;
             }
             .node {
             fill: none;
@@ -50,6 +43,20 @@
                 width: 1000px;
                 margin: 0 auto 0 auto;
             }
+            .list {
+                list-style: none;
+                float: left;
+                width: 50%;
+                padding: 0;
+                font-family: 'Helvetica', sans-serif;
+                color: #717171;
+            }
+            .list li { 
+                background: #F5F5F5; 
+            }
+            .list li:nth-child(odd) {
+                background: #FFFFFF; 
+            }
         </style>
         <script src="http://d3js.org/d3.v3.js" type="text/javascript"></script>
         <script src="app.js" type="text/javascript"></script>
@@ -57,8 +64,8 @@
     <body>
         <div id="chart"></div>
         <div id="lists">
-            <div id="list1"></div>
-            <div id="list2"></div>
+            <ul class="list" id="list1"></ul>
+            <ul class="list" id="list2"></ul>
         </div>
     </body>
 </html>

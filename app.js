@@ -3,7 +3,7 @@
  */
 
  /********** Global Config **********/
-var margin = { top: 0, right: 0, bottom: 40, left: 30 },
+var margin = { top: 20, right: 0, bottom: 40, left: 30 },
     width = 500 - margin.left - margin.right,
     height = 430 - margin.top - margin.bottom,
     gridSize = Math.floor(width / 24),
@@ -22,8 +22,52 @@ dataFormat = function(d) {
     return {
         day: +d.day,
         hour: +d.hour,
-        value: +d.value
+        value: +d.value,
+        x: (d.hour - 1) * gridSize,
+        y: (d.day - 1) * gridSize
     };
+}
+
+ /********** View Update **********/
+function updateList(listID, data) {
+    var element = document.getElementById(listID);
+    var listItem;
+    element.innerHTML = "";
+    data.forEach(function(d) {
+        listItem = document.createElement('li');
+        listItem.innerHTML = "Day: " + d.day + ",  Hour: " + d.hour + ",  Value: " + d.value;
+        element.appendChild(listItem);
+    });
+}
+
+ /********** Search Functions **********/
+// Collapse the quadtree into an array of rectangles.
+function nodes(quadtree) {
+    var nodes = [];
+    quadtree.visit(function(node, x1, y1, x2, y2) {
+        if (node.point) {
+            nodes.push({
+                point: node.point,
+                x: x1, 
+                y: y1, 
+                width: x2 - x1, 
+                height: y2 - y1,
+            });
+        }
+    });
+    return nodes;
+}
+
+// Find the nodes within the specified rectangle.
+function search(quadtree, x0, y0, x3, y3) {
+    quadtree.visit(function(node, x1, y1, x2, y2) {
+        var p = node.point;
+        if (p) {
+            // p.scanned = true;
+            node.point.selected = (p.x >= x0) && (p.x < x3) && (p.y >= y0) && (p.y < y3);
+        }
+        return x1 >= x3 || y1 >= y3 || x2 < x0 || y2 < y0;
+    });
 }
 
  /********** Graph Annotation **********/
@@ -80,11 +124,14 @@ graphCallbackOne = function(error, data) {
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+    // quadtree data structure to optimized brush seleciton searching
+    var quadtree = d3.geom.quadtree(data, -1, -1, width+1, height+1);
+
     var heatMap = svg.selectAll(".hour")
-        .data(data)
+        .data(nodes(quadtree))
         .enter().append("rect")
-        .attr("x", function(d) { return (d.hour - 1) * gridSize; })
-        .attr("y", function(d) { return (d.day - 1) * gridSize; })
+        .attr("x", function(d) { return (d.point.hour - 1) * gridSize; })
+        .attr("y", function(d) { return (d.point.day - 1) * gridSize; })
         .attr("rx", 4)
         .attr("ry", 4)
         .attr("class", "hour bordered")
@@ -93,16 +140,25 @@ graphCallbackOne = function(error, data) {
         .style("fill", colors[0]);
 
     heatMap.transition().duration(1000)
-        .style("fill", function(d) { return colorScale(d.value); });
+        .style("fill", function(d) { return colorScale(d.point.value); });
 
-    heatMap.append("title").text(function(d) { return d.value; });
+    heatMap.append("title").text(function(d) { return d.point.value; });
 
     graphAnnotate(svg, colorScale);
 
     // brush selection logic.
     function brushed1() {
-        if (!d3.event.sourceEvent) return;
+        var selectedNodes = [];
         var extent = heatmapBrush1.extent();
+        heatMap.each(function(d) { d.point.selected = false; });
+        search(quadtree, extent[0][0]-15, extent[0][1]-15, extent[1][0], extent[1][1]);
+        heatMap.classed("selected", function(d) { 
+            if (d.point.selected) selectedNodes.push(d.point);
+            return d.point.selected; 
+        });
+        updateList('list1',selectedNodes);
+        if (!d3.event.sourceEvent) return;
+        // synchronize other graph
         d3.select('.heatmapbrush2').transition()
             .call(heatmapBrush2.extent(extent))
             .call(heatmapBrush2.event);
@@ -130,11 +186,14 @@ graphCallbackTwo = function(error, data) {
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+    // quadtree data structure to optimized brush seleciton searching
+    var quadtree = d3.geom.quadtree(data, -1, -1, width+1, height+1);
+
     var heatMap = svg.selectAll(".hour")
-        .data(data)
+        .data(nodes(quadtree))
         .enter().append("rect")
-        .attr("x", function(d) { return (d.hour - 1) * gridSize; })
-        .attr("y", function(d) { return (d.day - 1) * gridSize; })
+        .attr("x", function(d) { return (d.point.hour - 1) * gridSize; })
+        .attr("y", function(d) { return (d.point.day - 1) * gridSize; })
         .attr("rx", 4)
         .attr("ry", 4)
         .attr("class", "hour bordered")
@@ -143,16 +202,25 @@ graphCallbackTwo = function(error, data) {
         .style("fill", colors[0]);
 
     heatMap.transition().duration(1000)
-        .style("fill", function(d) { return colorScale(d.value); });
+        .style("fill", function(d) { return colorScale(d.point.value); });
 
-    heatMap.append("title").text(function(d) { return d.value; });
+    heatMap.append("title").text(function(d) { return d.point.value; });
 
     graphAnnotate(svg, colorScale);
 
     // brush selection logic.
     function brushed2() {
-        if (!d3.event.sourceEvent) return;
+        var selectedNodes = [];
         var extent = heatmapBrush2.extent();
+        heatMap.each(function(d) { d.point.selected = false; });
+        search(quadtree, extent[0][0]-15, extent[0][1]-15, extent[1][0], extent[1][1]);
+        heatMap.classed("selected", function(d) {
+            if (d.point.selected) selectedNodes.push(d.point);
+            return d.point.selected; 
+        });
+        updateList('list2',selectedNodes);
+        if (!d3.event.sourceEvent) return;
+        // synchronize other graph
         d3.select('.heatmapbrush1').transition()
             .call(heatmapBrush1.extent(extent))
             .call(heatmapBrush1.event);
@@ -166,7 +234,7 @@ graphCallbackTwo = function(error, data) {
 
     svg.append("g")
         .attr("class", "heatmapbrush2")
-        .call(heatmapBrush2);
+        .call(heatmapBrush1);
 }
 
  /** Heatmap 1 ************************************/
@@ -175,5 +243,4 @@ d3.csv("data.csv", dataFormat, graphCallbackOne);
  /** Heatmap 2 ************************************/
 d3.csv("data.csv", dataFormat, graphCallbackTwo);
 
- /** Untested stuff that's cluttering the global namespace. ************************************/
 var width = 500,    height = 480;
