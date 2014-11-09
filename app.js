@@ -3,177 +3,230 @@
  */
 
  /********** Global Config **********/
-var margin = { top: 0, right: 0, bottom: 40, left: 30 },
-    width = 500 - margin.left - margin.right,
-    height = 430 - margin.top - margin.bottom,
-    gridSize = Math.floor(width / 24),
-    legendElementWidth = gridSize*2,
-    buckets = 9,
-    // Colors from colorbrewer.YlGnBu[9]
-    colors = ["#ffffd9","#edf8b1","#c7e9b4","#7fcdbb","#41b6c4",
-              "#1d91c0","#225ea8","#253494","#081d58"], 
-    days = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"],
-    times = ["1a", "2a", "3a", "4a", "5a", "6a", "7a", "8a", "9a",
-             "10a", "11a", "12a", "1p", "2p", "3p", "4p", "5p",
-             "6p", "7p", "8p", "9p", "10p", "11p", "12p"];
-
+var margin = { top: 20, right: 0, bottom: 40, left: 30 },
+	width = 500 - margin.left - margin.right,
+	height = 430+50 - margin.top - margin.bottom,
+	gridSize = Math.floor(width / 24),
+	legendElementWidth = gridSize*2,
+	buckets = 9,
+	// Colors from colorbrewer.YlGnBu[9]
+	colors = ["#ffffd9","#edf8b1","#c7e9b4","#7fcdbb","#41b6c4",
+			  "#1d91c0","#225ea8","#253494","#081d58"],
+	days = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"],
+	times = ["1a", "2a", "3a", "4a", "5a", "6a", "7a", "8a", "9a",
+			 "10a", "11a", "12a", "1p", "2p", "3p", "4p", "5p",
+			 "6p", "7p", "8p", "9p", "10p", "11p", "12p"];
+	console.log(gridSize);
  /********** Data format **********/
 dataFormat = function(d) {
-    return {
-        day: +d.day,
-        hour: +d.hour,
-        value: +d.value
-    };
+	return {
+		day: +d.day,
+		hour: +d.hour,
+		value: +d.value
+	};
 }
 
  /********** Graph Annotation **********/
 graphAnnotate = function(rootSvg, colorScale) {
-    var dayLabels = rootSvg.selectAll(".dayLabel")
-        .data(days)
-        .enter().append("text")
-        .text(function (d) { return d; })
-        .attr("x", 0)
-        .attr("y", function (d, i) { return i * gridSize; })
-        .style("text-anchor", "end")
-        .attr("transform", "translate(-6," + gridSize / 1.5 + ")")
-        .attr("class", function (d, i) { return ((i >= 0 && i <= 4) ? "dayLabel mono axis axis-workweek" : "dayLabel mono axis"); });
+	var dayLabels = rootSvg.selectAll(".dayLabel")
+		.data(days)
+		.enter().append("text")
+		.text(function (d) { return d; })
+		.attr("x", 0)
+		.attr("y", function (d, i) { return i * gridSize; })
+		.style("text-anchor", "end")
+		.attr("transform", "translate(-6," + gridSize / 1.5 + ")")
+		.attr("class", function (d, i) { return ((i >= 0 && i <= 4) ? "dayLabel mono axis axis-workweek" : "dayLabel mono axis"); });
 
-    var timeLabels = rootSvg.selectAll(".timeLabel")
-        .data(times)
-        .enter().append("text")
-        .text(function(d) { return d; })
-        .attr("x", function(d, i) { return i * gridSize; })
-        .attr("y", 0)
-        .style("text-anchor", "middle")
-        .attr("transform", "translate(" + gridSize / 2 + ", -6)")
-        .attr("class", function(d, i) { return ((i >= 7 && i <= 16) ? "timeLabel mono axis axis-worktime" : "timeLabel mono axis"); });
+	var timeLabels = rootSvg.selectAll(".timeLabel")
+		.data(times)
+		.enter().append("text")
+		.text(function(d) { return d; })
+		.attr("x", function(d, i) { return i * gridSize; })
+		.attr("y", 0)
+		.style("text-anchor", "middle")
+		.attr("transform", "translate(" + gridSize / 2 + ", -6)")
+		.attr("class", function(d, i) { return ((i >= 7 && i <= 16) ? "timeLabel mono axis axis-worktime" : "timeLabel mono axis"); });
 
-    var legend = rootSvg.selectAll(".legend")
-        .data([0].concat(colorScale.quantiles()), function(d) { return d; })
-        .enter().append("g")
-        .attr("class", "legend");
+	var legend = rootSvg.selectAll(".legend")
+		.data([0].concat(colorScale.quantiles()), function(d) { return d; })
+		.enter().append("g")
+		.attr("class", "legend");
 
-    legend.append("rect")
-        .attr("x", function(d, i) { return legendElementWidth * i; })
-        .attr("y", height-320)
-        .attr("width", legendElementWidth)
-        .attr("height", gridSize / 2)
-        .style("fill", function(d, i) { return colors[i]; });
+	legend.append("rect")
+		.attr("x", function(d, i) { return legendElementWidth * i; })
+		.attr("y", height-320)
+		.attr("width", legendElementWidth)
+		.attr("height", gridSize / 2)
+		.style("fill", function(d, i) { return colors[i]; });
 
-    legend.append("text")
-        .attr("class", "mono")
-        .text(function(d) { return "≥ " + Math.round(d); })
-        .attr("x", function(d, i) { return legendElementWidth * i; })
-        .attr("y", height-320 + gridSize);
+	legend.append("text")
+		.attr("class", "mono")
+		.text(function(d) { return "≥ " + Math.round(d); })
+		.attr("x", function(d, i) { return legendElementWidth * i; })
+		.attr("y", height-320 + gridSize);
 
 }
 
  /********** Graph callback **********/
 graphCallbackOne = function(error, data) {
-    var colorScale = d3.scale.quantile()
-        .domain([0, buckets - 1, d3.max(data, function (d) { return d.value; })])
-        .range(colors);
+	var colorScale = d3.scale.quantile()
+		.domain([0, buckets - 1, d3.max(data, function (d) { return d.value; })])
+		.range(colors);
 
-    var svg = d3.select("#chart").append("svg")
-        .attr("width", 500 )
-        .attr("height", 200 )
-        .append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+	var svg = d3.select("#chart").append("svg")
+		.attr("width", 500 )
+		.attr("height", 200 )
+		.append("g")
+		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    var heatMap = svg.selectAll(".hour")
-        .data(data)
-        .enter().append("rect")
-        .attr("x", function(d) { return (d.hour - 1) * gridSize; })
-        .attr("y", function(d) { return (d.day - 1) * gridSize; })
-        .attr("rx", 4)
-        .attr("ry", 4)
-        .attr("class", "hour bordered")
-        .attr("width", gridSize)
-        .attr("height", gridSize)
-        .style("fill", colors[0]);
+	var heatMap = svg.selectAll(".hour")
+		.data(data)
+		.enter().append("rect")
+		.attr("x", function(d) { return (d.hour - 1) * gridSize; })
+		.attr("y", function(d) { return (d.day - 1) * gridSize; })
+		.attr("rx", 4)
+		.attr("ry", 4)
+		.attr("class", "hour bordered")
+		.attr("width", gridSize)
+		.attr("height", gridSize)
+		.style("fill", colors[0]);
 
-    heatMap.transition().duration(1000)
-        .style("fill", function(d) { return colorScale(d.value); });
+	heatMap.transition().duration(1000)
+		.style("fill", function(d) { return colorScale(d.value); });
 
-    heatMap.append("title").text(function(d) { return d.value; });
+	heatMap.append("title").text(function(d) { return d.value; });
 
-    graphAnnotate(svg, colorScale);
+	graphAnnotate(svg, colorScale);
 
-    // brush selection logic.
-    function brushed1() {
-        if (!d3.event.sourceEvent) return;
-        var extent = heatmapBrush1.extent();
-        d3.select('.heatmapbrush2').transition()
-            .call(heatmapBrush2.extent(extent))
-            .call(heatmapBrush2.event);
-    }
+	// brush selection logic.
+	function brushed1() {
+		if (!d3.event.sourceEvent) return;
+		var extent = heatmapBrush1.extent();
+		d3.select('.heatmapbrush2').transition()
+			.call(heatmapBrush2.extent(extent))
+			.call(heatmapBrush2.event);
+		// console.log("Brush 1 Extent X", extent[0]);
+		// console.log("Brush 1 Extent W", extent[1]);
+		Min_x=extent[0][0] ;
+		Min_y=extent[1][0];
+		Max_x=extent[0][1];
+		Max_y=extent[1][1];
+		// console.log("Min_X= " +Min_x +" Hrs_Min = "+ Math.round(Min_x/19)+" Max_X = " +Max_x  + " Day_Min = "+Math.round((Max_x/19)%7));
+		// console.log("Min_Y= " + Min_y +" Hrs_Max = "+Math.round(Min_y/19)+" Max_Y = " + Max_y + " Day_Max = " +Math.round((Max_y/19)%7));
+		console.log(" Hrs_Min = "+ Math.round(Min_x/19)+" Day_Min = "+Math.round((Max_x/19)%7));
+		console.log(" Hrs_Max = "+Math.round(Min_y/19)+ " Day_Max = " +Math.round((Max_y/19)%7));
+		Hrs_Min =Math.round(Min_x/19);
+		Hrs_Max =Math.round(Min_y/19);
+		Day_Min =Math.round((Max_x/19)%7);
+		Day_Max =Math.round((Max_y/19)%7);
+		// console.log(data[0].value);
+		console.log("Finding values...");
+		console.log("D  H  V");
+		document.getElementById('list1').innerHTML = "";
+		for(var key in data) {
+			if(data[key].hour>=Hrs_Min+1 && data[key].hour<=Hrs_Max && data[key].day>=Day_Min && data[key].day<=Day_Max)
+				{
+				console.log(data[key].day + "  " + data[key].hour + " "+ data[key].value);
+				document.getElementById("list1").innerHTML += ('<div>'+"Day = "+data[key].day + " Hour =  " + data[key].hour + " "+ "Value = "+data[key].value+'</div>');
+				}
+		}
+	}
 
-    heatmapBrush1 = d3.svg.brush()
-        .x(d3.scale.identity().domain([0, width]))
-        .y(d3.scale.identity().domain([0, height/2]))
-        .extent([[100, 100], [200, 200]])
-        .on("brushend", brushed1);
+	heatmapBrush1 = d3.svg.brush()
+		.x(d3.scale.identity().domain([0, width]))
+		.y(d3.scale.identity().domain([0, height/2]))
+		.extent([[0, 0], [19, 132]])
+		.on("brushend", brushed1);
 
-    svg.append("g")
-        .attr("class", "heatmapbrush1")
-        .call(heatmapBrush1);
+	svg.append("g")
+		.attr("class", "heatmapbrush1")
+		.call(heatmapBrush1);
 }
 
 graphCallbackTwo = function(error, data) {
-    var colorScale = d3.scale.quantile()
-        .domain([0, buckets - 1, d3.max(data, function (d) { return d.value; })])
-        .range(colors);
+	var colorScale = d3.scale.quantile()
+		.domain([0, buckets - 1, d3.max(data, function (d) { return d.value; })])
+		.range(colors);
 
-    var svg = d3.select("#chart").append("svg")
-        .attr("width", 500 )
-        .attr("height", 200 )
-        .append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+	var svg = d3.select("#chart").append("svg")
+		.attr("width", 500 )
+		.attr("height", 200 )
+		.append("g")
+		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    var heatMap = svg.selectAll(".hour")
-        .data(data)
-        .enter().append("rect")
-        .attr("x", function(d) { return (d.hour - 1) * gridSize; })
-        .attr("y", function(d) { return (d.day - 1) * gridSize; })
-        .attr("rx", 4)
-        .attr("ry", 4)
-        .attr("class", "hour bordered")
-        .attr("width", gridSize)
-        .attr("height", gridSize)
-        .style("fill", colors[0]);
+	var heatMap = svg.selectAll(".hour")
+		.data(data)
+		.enter().append("rect")
+		.attr("x", function(d) { return (d.hour - 1) * gridSize; })
+		.attr("y", function(d) { return (d.day - 1) * gridSize; })
+		.attr("rx", 4)
+		.attr("ry", 4)
+		.attr("class", "hour bordered")
+		.attr("width", gridSize)
+		.attr("height", gridSize)
+		.style("fill", colors[0]);
 
-    heatMap.transition().duration(1000)
-        .style("fill", function(d) { return colorScale(d.value); });
+	heatMap.transition().duration(1000)
+		.style("fill", function(d) { return colorScale(d.value); });
 
-    heatMap.append("title").text(function(d) { return d.value; });
+	heatMap.append("title").text(function(d) { return d.value; });
 
-    graphAnnotate(svg, colorScale);
+	graphAnnotate(svg, colorScale);
 
-    // brush selection logic.
-    function brushed2() {
-        if (!d3.event.sourceEvent) return;
-        var extent = heatmapBrush2.extent();
-        d3.select('.heatmapbrush1').transition()
-            .call(heatmapBrush1.extent(extent))
-            .call(heatmapBrush1.event);
-    }
+	// brush selection logic.
+	function brushed2() {
+		if (!d3.event.sourceEvent) return;
+		var extent = heatmapBrush2.extent();
+		console.log(arguments);
 
-    heatmapBrush2 = d3.svg.brush()
-        .x(d3.scale.identity().domain([0, width]))
-        .y(d3.scale.identity().domain([0, height/2]))
-        .extent([[100, 100], [200, 200]])
-        .on("brushend", brushed2);
+		d3.select('.heatmapbrush1').transition()
+			.call(heatmapBrush1.extent(extent))
+			.call(heatmapBrush1.event);
+			// console.log("Brush 2 Extent", extent);
+			// console.log(data);
+		Min_x=extent[0][0] ;
+		Min_y=extent[1][0];
+		Max_x=extent[0][1];
+		Max_y=extent[1][1];
+		// console.log("Min_X= " +Min_x +" Hrs_Min = "+ Math.round(Min_x/19)+" Max_X = " +Max_x  + " Day_Min = "+Math.round((Max_x/19)%7));
+		// console.log("Min_Y= " + Min_y +" Hrs_Max = "+Math.round(Min_y/19)+" Max_Y = " + Max_y + " Day_Max = " +Math.round((Max_y/19)%7));
+		console.log(" Hrs_Min = "+ Math.round(Min_x/19)+" Day_Min = "+Math.round((Max_x/19)%7));
+		console.log(" Hrs_Max = "+Math.round(Min_y/19)+ " Day_Max = " +Math.round((Max_y/19)%7));
+		Hrs_Min =Math.round(Min_x/19);
+		Hrs_Max =Math.round(Min_y/19);
+		Day_Min =Math.round((Max_x/19)%7);
+		Day_Max =Math.round((Max_y/19)%7);
+		// console.log(data[0].value);
+		console.log("Finding values...");
+		console.log("D  H  V");
+		document.getElementById('list2').innerHTML = "";
+		for(var key in data) {
+			if(data[key].hour>=Hrs_Min+1 && data[key].hour<=Hrs_Max && data[key].day>=Day_Min && data[key].day<=Day_Max)
+				{
+				console.log(data[key].day + "  " + data[key].hour + " "+ data[key].value);
+				document.getElementById("list2").innerHTML += ('<div>'+"Day = "+data[key].day + " Hour =  " + data[key].hour + " "+ "Value = "+data[key].value+'</div>');
+				}
+		}
 
-    svg.append("g")
-        .attr("class", "heatmapbrush2")
-        .call(heatmapBrush2);
+	}
+
+	heatmapBrush2 = d3.svg.brush()
+		.x(d3.scale.identity().domain([0, width]))
+		.y(d3.scale.identity().domain([0, height/2]))
+		.extent([[0, 0], [19, 132]])
+		.on("brushend", brushed2);
+
+	svg.append("g")
+		.attr("class", "heatmapbrush2")
+		.call(heatmapBrush2);
 }
 
  /** Heatmap 1 ************************************/
 d3.csv("data.csv", dataFormat, graphCallbackOne);
 
  /** Heatmap 2 ************************************/
-d3.csv("data.csv", dataFormat, graphCallbackTwo);
+d3.csv("data_2.csv", dataFormat, graphCallbackTwo);
 
  /** Untested stuff that's cluttering the global namespace. ************************************/
 var width = 500,    height = 480;
