@@ -72,25 +72,25 @@ function search(quadtree, x0, y0, x3, y3) {
 
  /********** Graph Annotation **********/
 graphAnnotate = function(rootSvg, colorScale) {
-    var dayLabels = rootSvg.selectAll(".dayLabel")
-        .data(days)
-        .enter().append("text")
-        .text(function (d) { return d; })
-        .attr("x", 0)
-        .attr("y", function (d, i) { return i * gridSize; })
-        .style("text-anchor", "end")
-        .attr("transform", "translate(-6," + gridSize / 1.5 + ")")
-        .attr("class", function (d, i) { return ((i >= 0 && i <= 4) ? "dayLabel mono axis axis-workweek" : "dayLabel mono axis"); });
+    // var dayLabels = rootSvg.selectAll(".dayLabel")
+    //     .data(days)
+    //     .enter().append("text")
+    //     .text(function (d) { return d; })
+    //     .attr("x", 0)
+    //     .attr("y", function (d, i) { return i * gridSize; })
+    //     .style("text-anchor", "end")
+    //     .attr("transform", "translate(-6," + gridSize / 1.5 + ")")
+    //     .attr("class", function (d, i) { return ((i >= 0 && i <= 4) ? "dayLabel mono axis axis-workweek" : "dayLabel mono axis"); });
 
-    var timeLabels = rootSvg.selectAll(".timeLabel")
-        .data(times)
-        .enter().append("text")
-        .text(function(d) { return d; })
-        .attr("x", function(d, i) { return i * gridSize; })
-        .attr("y", 0)
-        .style("text-anchor", "middle")
-        .attr("transform", "translate(" + gridSize / 2 + ", -6)")
-        .attr("class", function(d, i) { return ((i >= 7 && i <= 16) ? "timeLabel mono axis axis-worktime" : "timeLabel mono axis"); });
+    // var timeLabels = rootSvg.selectAll(".timeLabel")
+    //     .data(times)
+    //     .enter().append("text")
+    //     .text(function(d) { return d; })
+    //     .attr("x", function(d, i) { return i * gridSize; })
+    //     .attr("y", 0)
+    //     .style("text-anchor", "middle")
+    //     .attr("transform", "translate(" + gridSize / 2 + ", -6)")
+    //     .attr("class", function(d, i) { return ((i >= 7 && i <= 16) ? "timeLabel mono axis axis-worktime" : "timeLabel mono axis"); });
 
     var legend = rootSvg.selectAll(".legend")
         .data([0].concat(colorScale.quantiles()), function(d) { return d; })
@@ -167,8 +167,8 @@ graphCallbackOne = function(error, data) {
     heatmapBrush1 = d3.svg.brush()
         .x(d3.scale.identity().domain([0, width]))
         .y(d3.scale.identity().domain([0, height/2]))
-        .extent([[100, 100], [200, 200]])
-        .on("brushend", brushed1);
+        .extent([[0, 0], [17, 132]])
+        .on("brush", brushed1);
 
     svg.append("g")
         .attr("class", "heatmapbrush1")
@@ -229,8 +229,8 @@ graphCallbackTwo = function(error, data) {
     heatmapBrush2 = d3.svg.brush()
         .x(d3.scale.identity().domain([0, width]))
         .y(d3.scale.identity().domain([0, height/2]))
-        .extent([[100, 100], [200, 200]])
-        .on("brushend", brushed2);
+        .extent([[0, 0], [17, 132]])
+        .on("brush", brushed2);
 
     svg.append("g")
         .attr("class", "heatmapbrush2")
@@ -241,6 +241,6 @@ graphCallbackTwo = function(error, data) {
 d3.csv("data.csv", dataFormat, graphCallbackOne);
 
  /** Heatmap 2 ************************************/
-d3.csv("data.csv", dataFormat, graphCallbackTwo);
+d3.csv("data2.csv", dataFormat, graphCallbackTwo);
 
 var width = 500,    height = 480;
