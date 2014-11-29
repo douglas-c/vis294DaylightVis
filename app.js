@@ -147,10 +147,23 @@
 
         graphAnnotate(svg, colorScale);
 
+        heatmapBrush1 = d3.svg.brush()
+            .x(d3.scale.identity().domain([0, width]))
+            .y(d3.scale.identity().domain([0, height/2]))
+            .extent([[0, 0], [17, 132]])
+            .on("brushend", brushed1);
+
         // brush selection logic.
         function brushed1() {
             var selectedNodes = [];
             var extent = heatmapBrush1.extent();
+
+            // lock brush to multiples of 20
+            extent[0][0] = Math.round(extent[0][0]/19)*19;
+            extent[0][1] = Math.round(extent[0][1]/19)*19;
+            extent[1][0] = Math.round(extent[1][0]/19)*19;
+            extent[1][1] = Math.round(extent[1][1]/19)*19;
+
             heatMap.each(function(d) { d.point.selected = false; });
             search(quadtree, extent[0][0]-15, extent[0][1]-15, extent[1][0], extent[1][1]);
             heatMap.classed("selected", function(d) { 
@@ -159,17 +172,14 @@
             });
             updateList('list1',selectedNodes);
             if (!d3.event.sourceEvent) return;
+            d3.select(this).transition()
+                .call(heatmapBrush1.extent(extent))
+                .call(heatmapBrush1.event);
             // synchronize other graph
             d3.select('.heatmapbrush2').transition()
                 .call(heatmapBrush2.extent(extent))
                 .call(heatmapBrush2.event);
         }
-
-        heatmapBrush1 = d3.svg.brush()
-            .x(d3.scale.identity().domain([0, width]))
-            .y(d3.scale.identity().domain([0, height/2]))
-            .extent([[0, 0], [17, 132]])
-            .on("brush", brushed1);
 
         svg.append("g")
             .attr("class", "heatmapbrush1")
@@ -209,10 +219,23 @@
 
         graphAnnotate(svg, colorScale);
 
+        heatmapBrush2 = d3.svg.brush()
+            .x(d3.scale.identity().domain([0, width]))
+            .y(d3.scale.identity().domain([0, height/2]))
+            .extent([[0, 0], [17, 132]])
+            .on("brushend", brushed2);
+
         // brush selection logic.
         function brushed2() {
             var selectedNodes = [];
             var extent = heatmapBrush2.extent();
+
+            // lock brush to multiples of 20
+            extent[0][0] = Math.round(extent[0][0]/19)*19;
+            extent[0][1] = Math.round(extent[0][1]/19)*19;
+            extent[1][0] = Math.round(extent[1][0]/19)*19;
+            extent[1][1] = Math.round(extent[1][1]/19)*19;
+
             heatMap.each(function(d) { d.point.selected = false; });
             search(quadtree, extent[0][0]-15, extent[0][1]-15, extent[1][0], extent[1][1]);
             heatMap.classed("selected", function(d) {
@@ -221,17 +244,14 @@
             });
             updateList('list2',selectedNodes);
             if (!d3.event.sourceEvent) return;
+            d3.select(this).transition()
+                .call(heatmapBrush2.extent(extent))
+                .call(heatmapBrush2.event);
             // synchronize other graph
             d3.select('.heatmapbrush1').transition()
                 .call(heatmapBrush1.extent(extent))
                 .call(heatmapBrush1.event);
         }
-
-        heatmapBrush2 = d3.svg.brush()
-            .x(d3.scale.identity().domain([0, width]))
-            .y(d3.scale.identity().domain([0, height/2]))
-            .extent([[0, 0], [17, 132]])
-            .on("brush", brushed2);
 
         svg.append("g")
             .attr("class", "heatmapbrush2")
