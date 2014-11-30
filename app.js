@@ -33,6 +33,7 @@
                 day: +d.day,
                 hour: +d.hour,
                 value: +d.value,
+                sensor: d.Sensor_id,
                 x: d.x,
                 y: d.y
         };
@@ -42,9 +43,11 @@
         function updateBar(barID, dataset) {
                 // Generate a Bates distribution of 10 random variables.
                 //var values = d3.range(1000).map(d3.random.bates(10));
-                values = [];
+                var values = [];
+                var sensorMap = [];
                 for (var i = 0, len = dataset.length; i < len; i++) {
                         val = dataset[i];
+                        sensorMap.push([val.value,val.sensor]);
                         values.push(val.value);
                 }
                 d3.select("#" + barID).select("svg").remove();
@@ -101,7 +104,18 @@
                                 return height - y(d.y);
                         })
                         .on("mouseover",function(d) {
-                            //console.log(d)
+                            var currentRect;
+                            for (var i = 0; i < sensorMap.length; i++) {
+                                for (var j = 0; j < d.length; j++) {
+                                    if (sensorMap[i][0]==d[j]) {
+                                        currentRect = ".rect"+sensorMap[i][1];
+                                        d3.selectAll(currentRect).classed("histogram",true);
+                                    }
+                                }
+                            }
+                        })
+                        .on("mouseout",function(d) {
+                            d3.selectAll(".selected").classed("histogram",false)
                         });
 
                 bar.append("text")
@@ -272,10 +286,15 @@
                     })
                     .attr("rx", 4)
                     .attr("ry", 4)
-                    .attr("class", "hour bordered")
+                    .attr("class", function(d) { 
+                        classStr = "hour bordered ";
+                        classStr += "rect"+String(d.point.sensor);
+                        return classStr; 
+                    })
                     .attr("width", gridSize)
                     .attr("height", gridSize)
                     .style("fill", colors[0]);
+            heatMapOneGlobalData = heatMap;
 
             heatMap.transition().duration(1000)
                     .style("fill", function(d) {
@@ -358,10 +377,15 @@
                     })
                     .attr("rx", 4)
                     .attr("ry", 4)
-                    .attr("class", "hour bordered")
+                    .attr("class", function(d) { 
+                        classStr = "hour bordered ";
+                        classStr += "rect"+String(d.point.sensor);
+                        return classStr; 
+                    })
                     .attr("width", gridSize)
                     .attr("height", gridSize)
                     .style("fill", colors[0]);
+            heatMapTwoGlobalData = heatMap;
 
             heatMap.transition().duration(1000)
                     .style("fill", function(d) {
