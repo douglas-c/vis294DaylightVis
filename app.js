@@ -61,7 +61,7 @@
                                 bottom: 20,
                                 left: 10
                         },
-                        width = 800 - margin.left - margin.right,
+                        width = 750 - margin.left - margin.right,
                         height = 100 - margin.top - margin.bottom;
 
                 var x = d3.scale.linear()
