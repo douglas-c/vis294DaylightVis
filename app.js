@@ -62,7 +62,7 @@
                                 bottom: 20,
                                 left: 10
                         },
-                        width = 750 - margin.left - margin.right,
+                        width = 620 - margin.left - margin.right,
                         height = 100 - margin.top - margin.bottom;
 
                 var x = d3.scale.linear()
@@ -165,13 +165,13 @@
                 var labels = true; // show the text labels beside individual boxplots
 
                 var margin = {
-                        top: 30,
+                        top: 5,
                         right: 5,
                         bottom: 70,
                         left: 30
                 };
                 var width = 150 - margin.left - margin.right;
-                var height = 400 - margin.top - margin.bottom;
+                var height = 350 - margin.top - margin.bottom;
 
                 var chart = d3.box()
                         .whiskers(iqr(1.5))
@@ -263,13 +263,13 @@
                 var labels = true; // show the text labels beside individual boxplots
 
                 var margin = {
-                        top: 30,
+                        top: 5,
                         right: 5,
                         bottom: 70,
                         left: 30
                 };
                 var width = 150 - margin.left - margin.right;
-                var height = 400 - margin.top - margin.bottom;
+                var height = 350 - margin.top - margin.bottom;
 
                 var chart = d3.box()
                         .whiskers(iqr(1.5))
