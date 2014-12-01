@@ -142,7 +142,9 @@
 
         /********** Build Box Chart **********/
         function updateBox1(boxID, dataset) {
-                // console.log(dataset);
+                if (!dataset || dataset.length==0) {
+                        return;
+                }
 
                 d3.select("#" + boxID).selectAll("svg").remove();
 
@@ -159,17 +161,16 @@
                         vals.push(formatCount(val.value));
                         data[0][1].push(formatCount(val.value));
                 }
-                // console.log("Data", data);
 
                 var labels = true; // show the text labels beside individual boxplots
 
                 var margin = {
                         top: 30,
-                        right: 50,
+                        right: 5,
                         bottom: 70,
-                        left: 50
+                        left: 30
                 };
-                var width = 400 - margin.left - margin.right;
+                var width = 150 - margin.left - margin.right;
                 var height = 400 - margin.top - margin.bottom;
 
                 var chart = d3.box()
@@ -213,7 +214,7 @@
                         .attr("transform", function(d) {
                                 return "translate(" + x(d[0]) + "," + margin.top + ")";
                         })
-                        .call(chart.width(x.rangeBand()));
+                        .call(chart.width(25));// x.rangeBand()));
 
                 // draw y axis
                 svg.append("g")
@@ -238,7 +239,9 @@
 
         /********** Build Box Chart **********/
         function updateBox2(boxID, dataset) {
-                // console.log(dataset);
+                if (!dataset || dataset.length==0) {
+                        return;
+                }
 
                 d3.select("#" + boxID).selectAll("svg").remove();
 
@@ -261,11 +264,11 @@
 
                 var margin = {
                         top: 30,
-                        right: 50,
+                        right: 5,
                         bottom: 70,
-                        left: 50
+                        left: 30
                 };
-                var width = 400 - margin.left - margin.right;
+                var width = 150 - margin.left - margin.right;
                 var height = 400 - margin.top - margin.bottom;
 
                 var chart = d3.box()
@@ -275,7 +278,7 @@
                         .showLabels(labels);
 
                 var svg = d3.select("#" + boxID).append("svg")
-                        .attr("width", width + margin.left + margin.right)
+                        .attr("width", width + margin.right + margin.left + margin.right)
                         .attr("height", height + margin.top + margin.bottom)
                         .attr("class", "box")
                         .append("g")
@@ -309,7 +312,7 @@
                         .attr("transform", function(d) {
                                 return "translate(" + x(d[0]) + "," + margin.top + ")";
                         })
-                        .call(chart.width(x.rangeBand()));
+                        .call(chart.width(25)); // x.rangeBand()));
 
                 // draw y axis
                 svg.append("g")
@@ -526,8 +529,9 @@
                         });
                         //updateList('list1', selectedNodes);
                         updateBar('bar1', selectedNodes);
-                        updateBox1('box1', selectedNodes);
+
                         if (!d3.event.sourceEvent) return;
+                        updateBox1('box1', selectedNodes);
                         d3.select(this).transition()
                                 .call(heatmapBrush1.extent(extent))
                                 .call(heatmapBrush1.event);
@@ -619,9 +623,9 @@
                         });
                         //updateList('list2', selectedNodes);
                         updateBar('bar2', selectedNodes);
-                        updateBox2('box2', selectedNodes);
 
                         if (!d3.event.sourceEvent) return;
+                        updateBox2('box2', selectedNodes);
                         d3.select(this).transition()
                                 .call(heatmapBrush2.extent(extent))
                                 .call(heatmapBrush2.event);
