@@ -9,8 +9,24 @@
             }
             #header {
                 width: 100%;
-                height: 40px;
-                background: #AEAEAE;
+                height: 35px;
+                margin-bottom: 10px;
+                padding-top: 5px;
+                background: #aeaeae;
+                background: -moz-linear-gradient(top,  #aeaeae 0%, #919191 100%);
+                background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#aeaeae), color-stop(100%,#919191));
+                background: -webkit-linear-gradient(top,  #aeaeae 0%,#919191 100%);
+                background: -o-linear-gradient(top,  #aeaeae 0%,#919191 100%);
+                background: linear-gradient(to bottom,  #aeaeae 0%,#919191 100%);
+                text-shadow: -1px 1px 2px rgba(100, 100, 100, 1);
+            }
+            #title {
+                width: 950px;
+                height: auto;
+                margin: 0 auto 0 auto;
+                font-family: Helvetica, sans-serif;
+                font-size: 18pt;
+                color: #FFFFFF;
             }
             rect.bordered {
             stroke: #E6E6E6;
@@ -175,7 +191,7 @@
     </head>
     <body>
         <div id="header">
-
+            <div id="title">Daylight Visualisation</div>
         </div>
         <div id="originalmaps">
             <div class="topchart" id="charta"></div>

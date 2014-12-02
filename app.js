@@ -85,6 +85,15 @@
                         .append("g")
                         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+                barcolors = ['rgb(254,217,118)',
+                        'rgb(254,178,76)', 'rgb(253,141,60)', 'rgb(252,78,42)', 'rgb(227,26,28)',
+                        'rgb(189,0,38)', 'rgb(128,0,38)'
+                ]
+
+                var barcolorScale = d3.scale.quantile()
+                        .domain([100, 960])
+                        .range(barcolors);
+
                 var bar = svg.selectAll(".bar")
                         .data(data)
                         .enter().append("g")
@@ -95,6 +104,10 @@
 
                 bar.append("rect")
                         .attr("x", 1)
+                        .style("fill", function(d) {
+                                return barcolorScale(d.x + x(d.x));
+
+                        })
                         .attr("width", 19)
                         .attr("height", function(d) {
                                 return height - y(d.y);
