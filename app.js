@@ -172,7 +172,7 @@
                 vals = [];
                 var data = [];
                 data[0] = [];
-                data[0][0] = boxID;
+                data[0][0] = "Solution A";
                 data[0][1] = [];
 
                 var formatCount = d3.format(",.0f");
@@ -272,7 +272,7 @@
                 vals = [];
                 var data = [];
                 data[0] = [];
-                data[0][0] = boxID;
+                data[0][0] = "Solution B";
                 data[0][1] = [];
 
                 var formatCount = d3.format(",.0f");
