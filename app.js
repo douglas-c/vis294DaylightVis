@@ -13,7 +13,7 @@
                 width = 200 - margin.left - margin.right,
                 height = 430 - margin.top - margin.bottom,
                 gridSize = 20, //Math.floor(width / 24),
-                legendElementWidth = gridSize*2,
+                legendElementWidth = gridSize * 2,
                 buckets = 9,
                 // Colors from colorbrewer.YlGnBu[9]
                 // colors = ["#ffffd9", "#edf8b1", "#c7e9b4", "#7fcdbb", "#41b6c4",
@@ -128,7 +128,7 @@
                         });
 
                 bar.append("text")
-                        .attr("class","mono")
+                        .attr("class", "mono")
                         .attr("y", -2)
                         .attr("x", 20 / 2)
                         .attr("text-anchor", "middle")
@@ -142,17 +142,17 @@
                         .call(xAxis);
 
                 var chartText = ""
-                if (barID=="bar1") {
+                if (barID == "bar1") {
                         chartText = "Solution A"
                 } else {
                         chartText = "Solution B"
                 }
 
                 svg.append("text")
-                        .text(chartText+": Luminance values")
-                        .attr("class","mono")
-                        .attr("x",0)
-                        .attr("y",89);
+                        .text(chartText + ": Luminance values")
+                        .attr("class", "mono")
+                        .attr("x", 0)
+                        .attr("y", 89);
 
         }
 
@@ -163,7 +163,7 @@
 
         /********** Build Box Chart **********/
         function updateBox1(boxID, dataset) {
-                if (!dataset || dataset.length==0) {
+                if (!dataset || dataset.length == 0) {
                         return;
                 }
 
@@ -189,7 +189,7 @@
                         top: 5,
                         right: 5,
                         bottom: 70,
-                        left: 30
+                        left: 50
                 };
                 var width = 150 - margin.left - margin.right;
                 var height = 350 - margin.top - margin.bottom;
@@ -236,8 +236,8 @@
                                 return "translate(" + x(d[0]) + "," + margin.top + ")";
                         })
                         .call(chart.width(25))
-                        .on("mouseover",function(d) {
-                                console.log("mouseover: "+d);
+                        .on("mouseover", function(d) {
+                                console.log("mouseover: " + d);
                         });
 
                 // draw y axis
@@ -246,11 +246,11 @@
                         .call(yAxis)
                         .append("text") // and text1
                 .attr("transform", "rotate(-90)")
-                        .attr("y", 6)
-                        .attr("dy", ".71em")
+                        .attr("y", -40)
+                        .attr("dy", ".91em")
                         .style("text-anchor", "end")
-                        .style("font-size", "16px");
-                // .text("Lux values");
+                        .attr("class", "titleText")
+                        .text("Luminance(lux)");
 
                 // draw x axis
                 svg.append("g")
@@ -263,7 +263,7 @@
 
         /********** Build Box Chart **********/
         function updateBox2(boxID, dataset) {
-                if (!dataset || dataset.length==0) {
+                if (!dataset || dataset.length == 0) {
                         return;
                 }
 
@@ -420,24 +420,36 @@
         /********** Graph Annotation **********/
         var graphAnnotate = function(rootSvg, colorScale, title) {
                 var dayLabels = rootSvg.selectAll(".dayLabel")
-                    .data(days)
-                    .enter().append("text")
-                    .text(function (d) { return d; })
-                    .attr("x", 0)
-                    .attr("y", function (d, i) { return i * gridSize; })
-                    .style("text-anchor", "end")
-                    .attr("transform", "translate(-4," + gridSize / 1.5 + ")")
-                    .attr("class", function (d, i) { return ((i >= 0 && i <= 4) ? "dayLabel mono axis axis-workweek" : "dayLabel mono axis"); });
+                        .data(days)
+                        .enter().append("text")
+                        .text(function(d) {
+                                return d;
+                        })
+                        .attr("x", 0)
+                        .attr("y", function(d, i) {
+                                return i * gridSize;
+                        })
+                        .style("text-anchor", "end")
+                        .attr("transform", "translate(-4," + gridSize / 1.5 + ")")
+                        .attr("class", function(d, i) {
+                                return ((i >= 0 && i <= 4) ? "dayLabel mono axis axis-workweek" : "dayLabel mono axis");
+                        });
 
                 var timeLabels = rootSvg.selectAll(".timeLabel")
-                    .data(times)
-                    .enter().append("text")
-                    .text(function(d) { return d; })
-                    .attr("x", function(d, i) { return i * gridSize; })
-                    .attr("y", 0)
-                    .style("text-anchor", "middle")
-                    .attr("transform", "translate(" + gridSize / 2 + ", -6)")
-                    .attr("class", function(d, i) { return ((i >= 7 && i <= 16) ? "timeLabel mono axis axis-worktime" : "timeLabel mono axis"); });
+                        .data(times)
+                        .enter().append("text")
+                        .text(function(d) {
+                                return d;
+                        })
+                        .attr("x", function(d, i) {
+                                return i * gridSize;
+                        })
+                        .attr("y", 0)
+                        .style("text-anchor", "middle")
+                        .attr("transform", "translate(" + gridSize / 2 + ", -6)")
+                        .attr("class", function(d, i) {
+                                return ((i >= 7 && i <= 16) ? "timeLabel mono axis axis-worktime" : "timeLabel mono axis");
+                        });
 
                 var legend = rootSvg.selectAll(".legend")
                         .data([0].concat(colorScale.quantiles()), function(d) {
@@ -469,7 +481,7 @@
                         });
 
                 rootSvg.append("text")
-                        .attr("class","titleText")
+                        .attr("class", "titleText")
                         .text(title)
                         .attr("x", 0)
                         .attr("y", 320);
@@ -729,7 +741,7 @@
                         return d.point.value;
                 });
 
-                graphAnnotate(svg, colorScale, "Delta Map");
+                graphAnnotate(svg, colorScale, "Delta Map (A-B)");
         }
 
         /** Heatmap 1 ************************************/
