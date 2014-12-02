@@ -13,7 +13,7 @@
                 width = 200 - margin.left - margin.right,
                 height = 430 - margin.top - margin.bottom,
                 gridSize = 20, //Math.floor(width / 24),
-                legendElementWidth = gridSize * 2,
+                legendElementWidth = gridSize*2,
                 buckets = 9,
                 // Colors from colorbrewer.YlGnBu[9]
                 // colors = ["#ffffd9", "#edf8b1", "#c7e9b4", "#7fcdbb", "#41b6c4",
@@ -23,11 +23,8 @@
                         'rgb(254,178,76)', 'rgb(253,141,60)', 'rgb(252,78,42)', 'rgb(227,26,28)',
                         'rgb(189,0,38)', 'rgb(128,0,38)'
                 ]
-        days = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"],
-        times = ["1a", "2a", "3a", "4a", "5a", "6a", "7a", "8a", "9a",
-                "10a", "11a", "12a", "1p", "2p", "3p", "4p", "5p",
-                "6p", "7p", "8p", "9p", "10p", "11p", "12p"
-        ];
+        days = ["7.7m", "", "", "", "", "", "", "", "", "", "", "", "", "", "0 m"],
+        times = ["0 m", "", "", "", "", "", "", "4 m"];
         /********** Data format **********/
         var dataFormat = function(d) {
                 return {
@@ -42,8 +39,6 @@
 
         /********** Build Bar Chart **********/
         function updateBar(barID, dataset) {
-                // Generate a Bates distribution of 10 random variables.
-                //var values = d3.range(1000).map(d3.random.bates(10));
                 var values = [];
                 var sensorMap = [];
                 for (var i = 0, len = dataset.length; i < len; i++) {
@@ -59,7 +54,7 @@
                 var margin = {
                                 top: 10,
                                 right: 10,
-                                bottom: 20,
+                                bottom: 30,
                                 left: 10
                         },
                         width = 620 - margin.left - margin.right,
@@ -120,8 +115,8 @@
                         });
 
                 bar.append("text")
-                        .attr("dy", ".75em")
-                        .attr("y", 3)
+                        .attr("class","mono")
+                        .attr("y", -2)
                         .attr("x", 20 / 2)
                         .attr("text-anchor", "middle")
                         .text(function(d) {
@@ -132,6 +127,19 @@
                         .attr("class", "x axis")
                         .attr("transform", "translate(0," + height + ")")
                         .call(xAxis);
+
+                var chartText = ""
+                if (barID=="bar1") {
+                        chartText = "Solution A"
+                } else {
+                        chartText = "Solution B"
+                }
+
+                svg.append("text")
+                        .text(chartText+": Luminance values")
+                        .attr("class","mono")
+                        .attr("x",0)
+                        .attr("y",89);
 
         }
 
@@ -214,7 +222,10 @@
                         .attr("transform", function(d) {
                                 return "translate(" + x(d[0]) + "," + margin.top + ")";
                         })
-                        .call(chart.width(25));// x.rangeBand()));
+                        .call(chart.width(25))
+                        .on("mouseover",function(d) {
+                                console.log("mouseover: "+d);
+                        });
 
                 // draw y axis
                 svg.append("g")
@@ -394,54 +405,61 @@
         }
 
         /********** Graph Annotation **********/
-        var graphAnnotate = function(rootSvg, colorScale) {
-                // var dayLabels = rootSvg.selectAll(".dayLabel")
-                //     .data(days)
-                //     .enter().append("text")
-                //     .text(function (d) { return d; })
-                //     .attr("x", 0)
-                //     .attr("y", function (d, i) { return i * gridSize; })
-                //     .style("text-anchor", "end")
-                //     .attr("transform", "translate(-6," + gridSize / 1.5 + ")")
-                //     .attr("class", function (d, i) { return ((i >= 0 && i <= 4) ? "dayLabel mono axis axis-workweek" : "dayLabel mono axis"); });
+        var graphAnnotate = function(rootSvg, colorScale, title) {
+                var dayLabels = rootSvg.selectAll(".dayLabel")
+                    .data(days)
+                    .enter().append("text")
+                    .text(function (d) { return d; })
+                    .attr("x", 0)
+                    .attr("y", function (d, i) { return i * gridSize; })
+                    .style("text-anchor", "end")
+                    .attr("transform", "translate(-4," + gridSize / 1.5 + ")")
+                    .attr("class", function (d, i) { return ((i >= 0 && i <= 4) ? "dayLabel mono axis axis-workweek" : "dayLabel mono axis"); });
 
-                // var timeLabels = rootSvg.selectAll(".timeLabel")
-                //     .data(times)
-                //     .enter().append("text")
-                //     .text(function(d) { return d; })
-                //     .attr("x", function(d, i) { return i * gridSize; })
-                //     .attr("y", 0)
-                //     .style("text-anchor", "middle")
-                //     .attr("transform", "translate(" + gridSize / 2 + ", -6)")
-                //     .attr("class", function(d, i) { return ((i >= 7 && i <= 16) ? "timeLabel mono axis axis-worktime" : "timeLabel mono axis"); });
+                var timeLabels = rootSvg.selectAll(".timeLabel")
+                    .data(times)
+                    .enter().append("text")
+                    .text(function(d) { return d; })
+                    .attr("x", function(d, i) { return i * gridSize; })
+                    .attr("y", 0)
+                    .style("text-anchor", "middle")
+                    .attr("transform", "translate(" + gridSize / 2 + ", -6)")
+                    .attr("class", function(d, i) { return ((i >= 7 && i <= 16) ? "timeLabel mono axis axis-worktime" : "timeLabel mono axis"); });
 
-                // var legend = rootSvg.selectAll(".legend")
-                //         .data([0].concat(colorScale.quantiles()), function(d) {
-                //                 return d;
-                //         })
-                //         .enter().append("g")
-                //         .attr("class", "legend");
+                var legend = rootSvg.selectAll(".legend")
+                        .data([0].concat(colorScale.quantiles()), function(d) {
+                                return d;
+                        })
+                        .enter().append("g")
+                        .attr("class", "legend");
 
-                // legend.append("rect")
-                //         .attr("x", function(d, i) {
-                //                 return legendElementWidth * i;
-                //         })
-                //         .attr("y", height - 320)
-                //         .attr("width", legendElementWidth)
-                //         .attr("height", gridSize / 2)
-                //         .style("fill", function(d, i) {
-                //                 return colors[i];
-                //         });
+                colorList = colorScale.range();
+                legend.append("rect")
+                        .attr("x", 170)
+                        .attr("y", function(d, i) {
+                                return gridSize * i;
+                        })
+                        .attr("width", gridSize / 2)
+                        .attr("height", gridSize)
+                        .style("fill", function(d, i) {
+                                return colorList[i];
+                        });
 
-                // legend.append("text")
-                //         .attr("class", "mono")
-                //         .text(function(d) {
-                //                 return "≥ " + Math.round(d);
-                //         })
-                //         .attr("x", function(d, i) {
-                //                 return legendElementWidth * i;
-                //         })
-                //         .attr("y", height - 320 + gridSize);
+                legend.append("text")
+                        .attr("class", "mono")
+                        .text(function(d) {
+                                return "≥ " + Math.round(d);
+                        })
+                        .attr("x", 170 + 12)
+                        .attr("y", function(d, i) {
+                                return gridSize + (gridSize * i)
+                        });
+
+                rootSvg.append("text")
+                        .attr("class","titleText")
+                        .text(title)
+                        .attr("x", 0)
+                        .attr("y", 320);
 
         }
 
@@ -512,7 +530,7 @@
                         return d.point.value;
                 });
 
-                graphAnnotate(svg, colorScale);
+                graphAnnotate(svg, colorScale, "Solution A");
 
                 // brush selection logic.
                 function brushed1() {
@@ -606,7 +624,7 @@
                         return d.point.value;
                 });
 
-                graphAnnotate(svg, colorScale);
+                graphAnnotate(svg, colorScale, "Solution B");
 
                 // brush selection logic.
                 function brushed2() {
@@ -652,16 +670,16 @@
         var graphCallbackThree = function(error, data) {
                 var colorScale = d3.scale.quantile()
                         .domain([d3.min(data, function(d) {
-                                        return Math.abs(d.value);
+                                        return d.value;
                                 }),
                                 buckets - 1,
                                 d3.max(data, function(d) {
                                         return d.value;
                                 })
                         ])
-                        .range(['rgb(255,255,255)', 'rgb(240,240,240)', 'rgb(217,217,217)',
-                                'rgb(189,189,189)', 'rgb(150,150,150)', 'rgb(115,115,115)',
-                                'rgb(82,82,82)', 'rgb(37,37,37)', 'rgb(0,0,0)'
+                        .range(["rgb(33,102,172)", "rgb(67,147,195)", "rgb(146,197,222)",
+                                "rgb(209,229,240)", "rgb(247,247,247)", "rgb(253,219,199)",
+                                "rgb(244,165,130)", "rgb(214,96,77)", "rgb(178,24,43)"
                         ]);
 
                 var svg = d3.select("#chartc").append("svg")
@@ -691,14 +709,14 @@
 
                 heatMap.transition().duration(1000)
                         .style("fill", function(d) {
-                                return colorScale(Math.abs(d.point.value));
+                                return colorScale(d.point.value);
                         });
 
                 heatMap.append("title").text(function(d) {
-                        return Math.abs(d.point.value);
+                        return d.point.value;
                 });
 
-                graphAnnotate(svg, colorScale);
+                graphAnnotate(svg, colorScale, "Delta Map");
         }
 
         /** Heatmap 1 ************************************/
