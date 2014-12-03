@@ -148,7 +148,7 @@
                 }
 
                 svg.append("text")
-                        .text(chartText + ": Luminance values")
+                        .text(chartText + ": Illuminance values")
                         .attr("class", "mono")
                         .attr("x", 0)
                         .attr("y", 89);
@@ -257,7 +257,7 @@
                         .attr("dy", ".91em")
                         .style("text-anchor", "end")
                         .attr("class", "titleText")
-                        .text("Luminance(lux)");
+                        .text("Illuminance(lux)");
 
                 // draw x axis
                 svg.append("g")
