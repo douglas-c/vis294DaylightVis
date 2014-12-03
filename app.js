@@ -182,6 +182,26 @@
                         data[0][1].push(formatCount(val.value));
                 }
 
+                // find median, compute upper and lower sets for heatmap interaction
+                vals.sort();
+                var sortMedian = 0;
+                if (vals.length % 2 == 1) {
+                        sortMedian = vals[Math.ceil(vals.length/2)-1]
+                } else {
+                        var m1 = Number(vals[vals.length/2 - 1])
+                        var m2 = Number(vals[vals.length/2])
+                        sortMedian = (m1 + m2) / 2;
+                }
+                var lowerSet = [];
+                var upperSet = [];
+                for (var i = 0, len = dataset.length; i < len; i++) {
+                        if (dataset[i].value < sortMedian) {
+                                lowerSet.push(".rect"+String(dataset[i].sensor));
+                        } else {
+                                upperSet.push(".rect"+String(dataset[i].sensor));
+                        }
+                }
+
                 var labels = true; // show the text labels beside individual boxplots
 
                 var margin = {
@@ -209,7 +229,6 @@
                 // the x-axis
                 var x = d3.scale.ordinal()
                         .domain(data.map(function(d) {
-                                // console.log(d);
                                 return d[0]
                         }))
                         .rangeRoundBands([0, width], 0.7, 0.3);
@@ -236,15 +255,27 @@
                         })
                         .call(chart.width(25))
                         .on("mouseover", function(d) {
-                                console.log("mouseover: " + d);
+                                // console.log("mouseover: " + d);
                                 pos = d3.mouse(this);
-                                console.log(pos[1]);
-                                // var medianY = d3.select(".median");
                                 var medianY = d3.select(".median").attr("y1")
                                 var diff = pos[1] - medianY;
-                                console.log(pos[1], medianY, diff);
-                                if (diff < 0) console.log("upper");
-                                else console.log("lower");
+                                if (diff < 0) {                 // upper half
+                                        for (var i = 0, len = upperSet.length; i < len; i++) {
+                                                d3.selectAll(upperSet[i]).classed("histogram", true);
+                                        }
+                                } else {                        // lower half
+                                        for (var i = 0, len = lowerSet.length; i < len; i++) {
+                                                d3.selectAll(lowerSet[i]).classed("histogram", true);
+                                        }                                
+                                }
+                        })
+                        .on("mouseout", function(d) {
+                                for (var i = 0, len = upperSet.length; i < len; i++) {
+                                        d3.selectAll(upperSet[i]).classed("histogram", false);
+                                }
+                                for (var i = 0, len = lowerSet.length; i < len; i++) {
+                                        d3.selectAll(lowerSet[i]).classed("histogram", false);
+                                }                                
                         });
 
                 // draw y axis
@@ -289,7 +320,26 @@
                         vals.push(formatCount(val.value));
                         data[0][1].push(formatCount(val.value));
                 }
-                // console.log("Data", data);
+
+                // find median, compute upper and lower sets for heatmap interaction
+                vals.sort();
+                var sortMedian = 0;
+                if (vals.length % 2 == 1) {
+                        sortMedian = vals[Math.ceil(vals.length/2)-1]
+                } else {
+                        var m1 = Number(vals[vals.length/2 - 1])
+                        var m2 = Number(vals[vals.length/2])
+                        sortMedian = (m1 + m2) / 2;
+                }
+                var lowerSet = [];
+                var upperSet = [];
+                for (var i = 0, len = dataset.length; i < len; i++) {
+                        if (dataset[i].value < sortMedian) {
+                                lowerSet.push(".rect"+String(dataset[i].sensor));
+                        } else {
+                                upperSet.push(".rect"+String(dataset[i].sensor));
+                        }
+                }
 
                 var labels = true; // show the text labels beside individual boxplots
 
@@ -318,7 +368,6 @@
                 // the x-axis
                 var x = d3.scale.ordinal()
                         .domain(data.map(function(d) {
-                                // console.log(d);
                                 return d[0]
                         }))
                         .rangeRoundBands([0, width], 0.7, 0.3);
@@ -343,7 +392,30 @@
                         .attr("transform", function(d) {
                                 return "translate(" + x(d[0]) + "," + margin.top + ")";
                         })
-                        .call(chart.width(25)); // x.rangeBand()));
+                        .call(chart.width(25))
+                        .on("mouseover", function(d) {
+                                // console.log("mouseover: " + d);
+                                pos = d3.mouse(this);
+                                var medianY = d3.select(".median").attr("y1")
+                                var diff = pos[1] - medianY;
+                                if (diff < 0) {                 // upper half
+                                        for (var i = 0, len = upperSet.length; i < len; i++) {
+                                                d3.selectAll(upperSet[i]).classed("histogram", true);
+                                        }
+                                } else {                        // lower half
+                                        for (var i = 0, len = lowerSet.length; i < len; i++) {
+                                                d3.selectAll(lowerSet[i]).classed("histogram", true);
+                                        }                                
+                                }
+                        })
+                        .on("mouseout", function(d) {
+                                for (var i = 0, len = upperSet.length; i < len; i++) {
+                                        d3.selectAll(upperSet[i]).classed("histogram", false);
+                                }
+                                for (var i = 0, len = lowerSet.length; i < len; i++) {
+                                        d3.selectAll(lowerSet[i]).classed("histogram", false);
+                                }                                
+                        });
 
                 // draw y axis
                 svg.append("g")
@@ -425,7 +497,7 @@
         }
 
         /********** Graph Annotation **********/
-        var graphAnnotate = function(rootSvg, colorScale, title) {
+        var graphAnnotate = function(rootSvg, colorScale, title, legendAddZero) {
                 var dayLabels = rootSvg.selectAll(".dayLabel")
                         .data(days)
                         .enter().append("text")
@@ -458,8 +530,14 @@
                                 return ((i >= 7 && i <= 16) ? "timeLabel mono axis axis-worktime" : "timeLabel mono axis");
                         });
 
+                legendData = []
+                if (legendAddZero) {
+                        legendData = [0].concat(colorScale.quantiles())
+                } else {
+                        legendData = colorScale.quantiles();
+                }
                 var legend = rootSvg.selectAll(".legend")
-                        .data([0].concat(colorScale.quantiles()), function(d) {
+                        .data(legendData, function(d) {
                                 return d;
                         })
                         .enter().append("g")
@@ -480,7 +558,6 @@
                 legend.append("text")
                         .attr("class", "mono")
                         .text(function(d) {
-                                console.log(d);
                                 return "≥ " + Math.round(d);
                         })
                         .attr("x", 170 + 12)
@@ -513,6 +590,7 @@
 
         /********** Graph callback **********/
         var graphCallbackOne = function(error, data) {
+                data_loaded[0] = true;
                 var colorScale = d3.scale.quantile()
                         .domain([d3.min(data, function(d) {
                                         return d.value;
@@ -563,7 +641,7 @@
                         return d.point.value;
                 });
 
-                graphAnnotate(svg, colorScale, "Solution A");
+                graphAnnotate(svg, colorScale, "Solution A", true);
 
                 // brush selection logic.
                 function brushed1() {
@@ -604,9 +682,11 @@
                 svg.append("g")
                         .attr("class", "heatmapbrush1")
                         .call(heatmapBrush1);
+                addFilter();
         }
 
         var graphCallbackTwo = function(error, data) {
+                data_loaded[1] = true;
                 var colorScale = d3.scale.quantile()
                         .domain([d3.min(data, function(d) {
                                         return d.value;
@@ -657,7 +737,7 @@
                         return d.point.value;
                 });
 
-                graphAnnotate(svg, colorScale, "Solution B");
+                graphAnnotate(svg, colorScale, "Solution B", true);
 
                 // brush selection logic.
                 function brushed2() {
@@ -698,6 +778,7 @@
                 svg.append("g")
                         .attr("class", "heatmapbrush2")
                         .call(heatmapBrush1);
+                addFilter();
         }
 
         var graphCallbackThree = function(error, data) {
@@ -749,7 +830,7 @@
                         return d.point.value;
                 });
 
-                graphAnnotate(svg, colorScale, "Delta Map (A-B)");
+                graphAnnotate(svg, colorScale, "Delta Map (A-B)", false);
         }
 
         /** Heatmap 1 ************************************/
@@ -760,4 +841,27 @@
 
         /** Delta Heatmap ************************************/
         d3.csv("Delta_map.csv", dataFormat, graphCallbackThree);
+
+        /** Filter slider ******************************/
+        var data_loaded = [false, false];
+        var sliderCreated = false;              // stop race conditions
+        var addFilter = function() {
+                if (!data_loaded[0] && !data_loaded[1]) return;
+                if (sliderCreated) return;
+                sliderCreated = true;
+                d3.select("#slider").call(d3.slider().on("slide", function(evt, value) {
+                        d3.select('#filtermin').text((value).toFixed());
+                        var dataItems = d3.selectAll('.hour');
+                        dataItems.filter(function(d,i) {
+                                if (d.point.value < value) {
+                                        d3.select(this).classed("filter",true);
+                                } else {
+                                        d3.select(this).classed("filter",false);
+                                }
+                        });
+                })
+                .value(0)
+                .min(109)
+                .max(970));
+        }
 })();
