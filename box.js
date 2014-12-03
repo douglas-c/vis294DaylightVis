@@ -116,6 +116,7 @@
                                 box.enter().append("rect")
                                         .attr("class", "box")
                                         .attr("x", 0)
+                                        .attr("id", "boxx")
                                         .attr("y", function(d) {
                                                 return x0(d[2]);
                                         })
@@ -147,6 +148,7 @@
 
                                 medianLine.enter().append("line")
                                         .attr("class", "median")
+                                        .attr("id", "median")
                                         .attr("x1", 0)
                                         .attr("y1", x0)
                                         .attr("x2", width)

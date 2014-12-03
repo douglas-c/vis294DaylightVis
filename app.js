@@ -106,7 +106,6 @@
                         .attr("x", 1)
                         .style("fill", function(d) {
                                 return barcolorScale(d.x + x(d.x));
-
                         })
                         .attr("width", 19)
                         .attr("height", function(d) {
@@ -238,6 +237,14 @@
                         .call(chart.width(25))
                         .on("mouseover", function(d) {
                                 console.log("mouseover: " + d);
+                                pos = d3.mouse(this);
+                                console.log(pos[1]);
+                                // var medianY = d3.select(".median");
+                                var medianY = d3.select(".median").attr("y1")
+                                var diff = pos[1] - medianY;
+                                console.log(pos[1], medianY, diff);
+                                if (diff < 0) console.log("upper");
+                                else console.log("lower");
                         });
 
                 // draw y axis
@@ -473,6 +480,7 @@
                 legend.append("text")
                         .attr("class", "mono")
                         .text(function(d) {
+                                console.log(d);
                                 return "≥ " + Math.round(d);
                         })
                         .attr("x", 170 + 12)
