@@ -253,7 +253,7 @@
                         .call(yAxis)
                         .append("text") // and text1
                 .attr("transform", "rotate(-90)")
-                        .attr("y", -40)
+                        .attr("y", -45)
                         .attr("dy", ".91em")
                         .style("text-anchor", "end")
                         .attr("class", "titleText")
