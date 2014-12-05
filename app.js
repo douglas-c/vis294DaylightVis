@@ -51,7 +51,7 @@
                                 top: 10,
                                 right: 10,
                                 bottom: 30,
-                                left: 25//10
+                                left: 25 //10
                         },
                         width = 620 - margin.left - margin.right,
                         height = 100 - margin.top - margin.bottom;
@@ -145,9 +145,9 @@
                         .call(xAxis);
 
                 svg.append("g")
-                        .attr("class","y axis")
-                        //.attr("transform", "translate("+String(15)+",0)")
-                        .call(yAxis);
+                        .attr("class", "y axis")
+                //.attr("transform", "translate("+String(15)+",0)")
+                .call(yAxis);
 
                 var chartText = ""
                 if (barID == "bar1") {
@@ -195,19 +195,19 @@
                 vals.sort();
                 var sortMedian = 0;
                 if (vals.length % 2 == 1) {
-                        sortMedian = vals[Math.ceil(vals.length/2)-1]
+                        sortMedian = vals[Math.ceil(vals.length / 2) - 1]
                 } else {
-                        var m1 = Number(vals[vals.length/2 - 1])
-                        var m2 = Number(vals[vals.length/2])
+                        var m1 = Number(vals[vals.length / 2 - 1])
+                        var m2 = Number(vals[vals.length / 2])
                         sortMedian = (m1 + m2) / 2;
                 }
                 var lowerSet = [];
                 var upperSet = [];
                 for (var i = 0, len = dataset.length; i < len; i++) {
                         if (dataset[i].value < sortMedian) {
-                                lowerSet.push(".rect"+String(dataset[i].sensor));
+                                lowerSet.push(".rect" + String(dataset[i].sensor));
                         } else {
-                                upperSet.push(".rect"+String(dataset[i].sensor));
+                                upperSet.push(".rect" + String(dataset[i].sensor));
                         }
                 }
 
@@ -268,14 +268,14 @@
                                 pos = d3.mouse(this);
                                 var medianY = d3.select(".median").attr("y1")
                                 var diff = pos[1] - medianY;
-                                if (diff < 0) {                 // upper half
+                                if (diff < 0) { // upper half
                                         for (var i = 0, len = upperSet.length; i < len; i++) {
                                                 d3.selectAll(upperSet[i]).classed("histogram", true);
                                         }
-                                } else {                        // lower half
+                                } else { // lower half
                                         for (var i = 0, len = lowerSet.length; i < len; i++) {
                                                 d3.selectAll(lowerSet[i]).classed("histogram", true);
-                                        }                                
+                                        }
                                 }
                         })
                         .on("mouseout", function(d) {
@@ -284,7 +284,7 @@
                                 }
                                 for (var i = 0, len = lowerSet.length; i < len; i++) {
                                         d3.selectAll(lowerSet[i]).classed("histogram", false);
-                                }                                
+                                }
                         });
 
                 // draw y axis
@@ -334,19 +334,19 @@
                 vals.sort();
                 var sortMedian = 0;
                 if (vals.length % 2 == 1) {
-                        sortMedian = vals[Math.ceil(vals.length/2)-1]
+                        sortMedian = vals[Math.ceil(vals.length / 2) - 1]
                 } else {
-                        var m1 = Number(vals[vals.length/2 - 1])
-                        var m2 = Number(vals[vals.length/2])
+                        var m1 = Number(vals[vals.length / 2 - 1])
+                        var m2 = Number(vals[vals.length / 2])
                         sortMedian = (m1 + m2) / 2;
                 }
                 var lowerSet = [];
                 var upperSet = [];
                 for (var i = 0, len = dataset.length; i < len; i++) {
                         if (dataset[i].value < sortMedian) {
-                                lowerSet.push(".rect"+String(dataset[i].sensor));
+                                lowerSet.push(".rect" + String(dataset[i].sensor));
                         } else {
-                                upperSet.push(".rect"+String(dataset[i].sensor));
+                                upperSet.push(".rect" + String(dataset[i].sensor));
                         }
                 }
 
@@ -407,14 +407,14 @@
                                 pos = d3.mouse(this);
                                 var medianY = d3.select(".median").attr("y1")
                                 var diff = pos[1] - medianY;
-                                if (diff < 0) {                 // upper half
+                                if (diff < 0) { // upper half
                                         for (var i = 0, len = upperSet.length; i < len; i++) {
                                                 d3.selectAll(upperSet[i]).classed("histogram", true);
                                         }
-                                } else {                        // lower half
+                                } else { // lower half
                                         for (var i = 0, len = lowerSet.length; i < len; i++) {
                                                 d3.selectAll(lowerSet[i]).classed("histogram", true);
-                                        }                                
+                                        }
                                 }
                         })
                         .on("mouseout", function(d) {
@@ -423,7 +423,7 @@
                                 }
                                 for (var i = 0, len = lowerSet.length; i < len; i++) {
                                         d3.selectAll(lowerSet[i]).classed("histogram", false);
-                                }                                
+                                }
                         });
 
                 // draw y axis
@@ -598,15 +598,18 @@
         /********** Graph callback **********/
         var graphCallbackOne = function(error, data) {
                 data_loaded[0] = true;
+                // var colorScale = d3.scale.quantile()
+                //         .domain([d3.min(data, function(d) {
+                //                         return d.value;
+                //                 }),
+                //                 buckets - 1,
+                //                 d3.max(data, function(d) {
+                //                         return d.value;
+                //                 })
+                //         ])
+                //         .range(colors);
                 var colorScale = d3.scale.quantile()
-                        .domain([d3.min(data, function(d) {
-                                        return d.value;
-                                }),
-                                buckets - 1,
-                                d3.max(data, function(d) {
-                                        return d.value;
-                                })
-                        ])
+                        .domain([120, 970]) //global min and max values from CSV file
                         .range(colors);
 
                 var svg = d3.select("#charta").append("svg")
@@ -696,16 +699,20 @@
 
         var graphCallbackTwo = function(error, data) {
                 data_loaded[1] = true;
+                // var colorScale = d3.scale.quantile()
+                //         .domain([d3.min(data, function(d) {
+                //                         return d.value;
+                //                 }),
+                //                 buckets - 1,
+                //                 d3.max(data, function(d) {
+                //                         return d.value;
+                //                 })
+                //         ])
+                //         .range(colors);
                 var colorScale = d3.scale.quantile()
-                        .domain([d3.min(data, function(d) {
-                                        return d.value;
-                                }),
-                                buckets - 1,
-                                d3.max(data, function(d) {
-                                        return d.value;
-                                })
-                        ])
+                        .domain([120, 970])
                         .range(colors);
+
 
                 var svg = d3.select("#chartb").append("svg")
                         .attr("width", 250)
@@ -794,18 +801,22 @@
         }
 
         var graphCallbackThree = function(error, data) {
-                var deltaMin = d3.min(data, function(d) { return d.value; });
-                var deltaMax = d3.max(data, function(d) { return d.value; });
+                var deltaMin = d3.min(data, function(d) {
+                        return d.value;
+                });
+                var deltaMax = d3.max(data, function(d) {
+                        return d.value;
+                });
 
                 var colorScale = d3.scale.linear()
-                        .domain([deltaMin,0,deltaMax])
+                        .domain([deltaMin, 0, deltaMax])
                         .range(["rgb(33,102,172)", "rgb(247,247,247)", "rgb(178,24,43)"])
                         .interpolate(d3.interpolateRgb);
 
                 // hack to make this color scale compatible with the graphAnnotate function
                 // for drawing the legend
                 colorScale.quantiles = function() {
-                        return [deltaMin,0,deltaMax];
+                        return [deltaMin, 0, deltaMax];
                 }
 
                 var svg = d3.select("#chartc").append("svg")
@@ -889,24 +900,24 @@
 
         /** Filter slider ******************************/
         var data_loaded = [false, false];
-        var sliderCreated = false;              // stop race conditions
+        var sliderCreated = false; // stop race conditions
         var addFilter = function() {
                 if (!data_loaded[0] && !data_loaded[1]) return;
                 if (sliderCreated) return;
                 sliderCreated = true;
                 d3.select("#slider").call(d3.slider().on("slide", function(evt, value) {
-                        d3.select('#filtermin').text((value).toFixed());
-                        var dataItems = d3.selectAll('.hour');
-                        dataItems.filter(function(d,i) {
-                                if (d.point.value < value) {
-                                        d3.select(this).classed("filter",true);
-                                } else {
-                                        d3.select(this).classed("filter",false);
-                                }
-                        });
-                })
-                .value(0)
-                .min(109)
-                .max(970));
+                                d3.select('#filtermin').text((value).toFixed());
+                                var dataItems = d3.selectAll('.hour');
+                                dataItems.filter(function(d, i) {
+                                        if (d.point.value < value) {
+                                                d3.select(this).classed("filter", true);
+                                        } else {
+                                                d3.select(this).classed("filter", false);
+                                        }
+                                });
+                        })
+                        .value(0)
+                        .min(109)
+                        .max(970));
         }
 })();
