@@ -609,7 +609,7 @@
                 //         ])
                 //         .range(colors);
                 var colorScale = d3.scale.quantile()
-                        .domain([120, 970]) //global min and max values from CSV file
+                        .domain([15, 950]) //global min and max values from CSV file
                         .range(colors);
 
                 var svg = d3.select("#charta").append("svg")
@@ -710,7 +710,7 @@
                 //         ])
                 //         .range(colors);
                 var colorScale = d3.scale.quantile()
-                        .domain([120, 970])
+                        .domain([15, 950])
                         .range(colors);
 
 
