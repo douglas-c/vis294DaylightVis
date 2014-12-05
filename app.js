@@ -15,10 +15,6 @@
                 gridSize = 20, //Math.floor(width / 24),
                 legendElementWidth = gridSize * 2,
                 buckets = 9,
-                // Colors from colorbrewer.YlGnBu[9]
-                // colors = ["#ffffd9", "#edf8b1", "#c7e9b4", "#7fcdbb", "#41b6c4",
-                //         "#1d91c0", "#225ea8", "#253494", "#081d58"
-                // ],
                 colors = ['rgb(255,255,204)', 'rgb(255,237,160)', 'rgb(254,217,118)',
                         'rgb(254,178,76)', 'rgb(253,141,60)', 'rgb(252,78,42)', 'rgb(227,26,28)',
                         'rgb(189,0,38)', 'rgb(128,0,38)'
@@ -55,7 +51,7 @@
                                 top: 10,
                                 right: 10,
                                 bottom: 30,
-                                left: 10
+                                left: 25//10
                         },
                         width = 620 - margin.left - margin.right,
                         height = 100 - margin.top - margin.bottom;
@@ -78,6 +74,11 @@
                 var xAxis = d3.svg.axis()
                         .scale(x)
                         .orient("bottom");
+
+                var yAxis = d3.svg.axis()
+                        .scale(y)
+                        .orient("left")
+                        .ticks(4);
 
                 var svg = d3.select("#" + barID).append("svg")
                         .attr("width", width + margin.left + margin.right)
@@ -112,6 +113,15 @@
                                 return height - y(d.y);
                         })
                         .on("mouseover", function(d) {
+                                var parent = d3.select(this.parentNode);
+                                parent.append("text")
+                                        .attr("class", "mono")
+                                        .attr("x", 20 / 2)
+                                        .attr("y", -2)
+                                        .attr("text-anchor", "middle")
+                                        .text(function(d) {
+                                                return formatCount(d.y);
+                                        });
                                 var currentRect;
                                 for (var i = 0; i < sensorMap.length; i++) {
                                         for (var j = 0; j < d.length; j++) {
@@ -123,22 +133,21 @@
                                 }
                         })
                         .on("mouseout", function(d) {
+                                var parent = d3.select(this.parentNode);
+                                var text = parent.select("text");
+                                text.remove();
                                 d3.selectAll(".selected").classed("histogram", false)
-                        });
-
-                bar.append("text")
-                        .attr("class", "mono")
-                        .attr("y", -2)
-                        .attr("x", 20 / 2)
-                        .attr("text-anchor", "middle")
-                        .text(function(d) {
-                                return formatCount(d.y);
                         });
 
                 svg.append("g")
                         .attr("class", "x axis")
                         .attr("transform", "translate(0," + height + ")")
                         .call(xAxis);
+
+                svg.append("g")
+                        .attr("class","y axis")
+                        //.attr("transform", "translate("+String(15)+",0)")
+                        .call(yAxis);
 
                 var chartText = ""
                 if (barID == "bar1") {
@@ -438,7 +447,6 @@
 
         }
 
-
         // Returns a function to compute the interquartile range.
         function iqr(k) {
                 return function(d, i) {
@@ -452,7 +460,6 @@
                         return [i, j];
                 };
         }
-
 
         /********** View Update **********/
         function updateList(listID, data) {
@@ -656,7 +663,6 @@
                                 if (d.point.selected) selectedNodes.push(d.point);
                                 return d.point.selected;
                         });
-                        //updateList('list1', selectedNodes);
                         updateBar('bar1', selectedNodes);
 
                         if (!d3.event.sourceEvent) return;
@@ -668,6 +674,9 @@
                         d3.select('.heatmapbrush2').transition()
                                 .call(heatmapBrush2.extent(extent))
                                 .call(heatmapBrush2.event);
+                        d3.select('.heatmapbrush3').transition()
+                                .call(heatmapBrush3.extent(extent))
+                                .call(heatmapBrush3.event);
                 }
 
                 heatmapBrush1 = d3.svg.brush()
@@ -675,7 +684,7 @@
                         .y(d3.scale.identity().domain([0, height]))
                         .extent([
                                 [0, 0],
-                                [17, 132]
+                                [20, 300]
                         ])
                         .on("brushend", brushed1);
 
@@ -764,6 +773,9 @@
                         d3.select('.heatmapbrush1').transition()
                                 .call(heatmapBrush1.extent(extent))
                                 .call(heatmapBrush1.event);
+                        d3.select('.heatmapbrush3').transition()
+                                .call(heatmapBrush3.extent(extent))
+                                .call(heatmapBrush3.event);
                 }
 
                 heatmapBrush2 = d3.svg.brush()
@@ -771,30 +783,30 @@
                         .y(d3.scale.identity().domain([0, height]))
                         .extent([
                                 [0, 0],
-                                [17, 132]
+                                [20, 300]
                         ])
                         .on("brushend", brushed2);
 
                 svg.append("g")
                         .attr("class", "heatmapbrush2")
-                        .call(heatmapBrush1);
+                        .call(heatmapBrush2);
                 addFilter();
         }
 
         var graphCallbackThree = function(error, data) {
-                var colorScale = d3.scale.quantile()
-                        .domain([d3.min(data, function(d) {
-                                        return d.value;
-                                }),
-                                buckets - 1,
-                                d3.max(data, function(d) {
-                                        return d.value;
-                                })
-                        ])
-                        .range(["rgb(33,102,172)", "rgb(67,147,195)", "rgb(146,197,222)",
-                                "rgb(209,229,240)", "rgb(247,247,247)", "rgb(253,219,199)",
-                                "rgb(244,165,130)", "rgb(214,96,77)", "rgb(178,24,43)"
-                        ]);
+                var deltaMin = d3.min(data, function(d) { return d.value; });
+                var deltaMax = d3.max(data, function(d) { return d.value; });
+
+                var colorScale = d3.scale.linear()
+                        .domain([deltaMin,0,deltaMax])
+                        .range(["rgb(33,102,172)", "rgb(247,247,247)", "rgb(178,24,43)"])
+                        .interpolate(d3.interpolateRgb);
+
+                // hack to make this color scale compatible with the graphAnnotate function
+                // for drawing the legend
+                colorScale.quantiles = function() {
+                        return [deltaMin,0,deltaMax];
+                }
 
                 var svg = d3.select("#chartc").append("svg")
                         .attr("width", 250)
@@ -831,6 +843,39 @@
                 });
 
                 graphAnnotate(svg, colorScale, "Delta Map (A-B)", false);
+
+                // brush selection logic.
+                function brushed3() {
+                        var selectedNodes = [];
+                        var extent = brushSnap(heatmapBrush3.extent());
+
+                        if (!d3.event.sourceEvent) return;
+
+                        d3.select(this).transition()
+                                .call(heatmapBrush3.extent(extent))
+                                .call(heatmapBrush3.event);
+                        // synchronize other graph
+                        d3.select('.heatmapbrush1').transition()
+                                .call(heatmapBrush1.extent(extent))
+                                .call(heatmapBrush1.event);
+                        d3.select('.heatmapbrush2').transition()
+                                .call(heatmapBrush2.extent(extent))
+                                .call(heatmapBrush2.event);
+                }
+
+                heatmapBrush3 = d3.svg.brush()
+                        .x(d3.scale.identity().domain([0, width]))
+                        .y(d3.scale.identity().domain([0, height]))
+                        .extent([
+                                [0, 0],
+                                [20, 300]
+                        ])
+                        .on("brushend", brushed3);
+
+                svg.append("g")
+                        .attr("class", "heatmapbrush3")
+                        .call(heatmapBrush3);
+                addFilter();
         }
 
         /** Heatmap 1 ************************************/

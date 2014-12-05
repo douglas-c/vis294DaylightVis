@@ -65,8 +65,14 @@
             }
             .extent {
             stroke: #ff0000;
-            fill-opacity: .125;
+            fill-opacity: 0;
             shape-rendering: crispEdges;
+            }
+            .heatmapbrush3 .extent {
+                stroke: #000000;
+                fill-opacity: 0;
+                stroke-width: 2px;
+                shape-rendering: crispEdges;
             }
             #charts {
                 width:950px;
@@ -163,8 +169,8 @@
             .box line,
             .box rect,
             .box circle {
-              fill: #de2d26;
-              stroke: #000;
+              fill: #eaeaea;
+              stroke: #000000;
               stroke-width: 1px;
             }
 
@@ -218,7 +224,7 @@
             <div id="title">Daylight Comparison Tool</div>
         </div>
         <div id="filter">
-            <span>Filter by Luminance Value</span>
+            <span>Filter by Illuminance Value</span>
             <span class="mono">current minimum: <span id="filtermin">0</span></span>
             <div id="slider"></div>
         </div>
