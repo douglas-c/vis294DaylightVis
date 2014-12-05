@@ -103,6 +103,13 @@
                                 return "translate(" + x(d.x) + "," + y(d.y) + ")";
                         });
 
+                var rectangleIdPrefix = "";
+                if (barID=="bar1") {
+                        rectangleIdPrefix = ".Arect";
+                } else {
+                        rectangleIdPrefix = ".Brect";
+                }
+
                 bar.append("rect")
                         .attr("x", 1)
                         .style("fill", function(d) {
@@ -126,7 +133,7 @@
                                 for (var i = 0; i < sensorMap.length; i++) {
                                         for (var j = 0; j < d.length; j++) {
                                                 if (sensorMap[i][0] == d[j]) {
-                                                        currentRect = ".rect" + sensorMap[i][1];
+                                                        currentRect = rectangleIdPrefix + sensorMap[i][1];
                                                         d3.selectAll(currentRect).classed("histogram", true);
                                                 }
                                         }
@@ -205,9 +212,9 @@
                 var upperSet = [];
                 for (var i = 0, len = dataset.length; i < len; i++) {
                         if (dataset[i].value < sortMedian) {
-                                lowerSet.push(".rect" + String(dataset[i].sensor));
+                                lowerSet.push(".Arect" + String(dataset[i].sensor));
                         } else {
-                                upperSet.push(".rect" + String(dataset[i].sensor));
+                                upperSet.push(".Arect" + String(dataset[i].sensor));
                         }
                 }
 
@@ -270,20 +277,20 @@
                                 var diff = pos[1] - medianY;
                                 if (diff < 0) { // upper half
                                         for (var i = 0, len = upperSet.length; i < len; i++) {
-                                                d3.selectAll(upperSet[i]).classed("histogram", true);
+                                                d3.select(upperSet[i]).classed("histogram", true);
                                         }
                                 } else { // lower half
                                         for (var i = 0, len = lowerSet.length; i < len; i++) {
-                                                d3.selectAll(lowerSet[i]).classed("histogram", true);
+                                                d3.select(lowerSet[i]).classed("histogram", true);
                                         }
                                 }
                         })
                         .on("mouseout", function(d) {
                                 for (var i = 0, len = upperSet.length; i < len; i++) {
-                                        d3.selectAll(upperSet[i]).classed("histogram", false);
+                                        d3.select(upperSet[i]).classed("histogram", false);
                                 }
                                 for (var i = 0, len = lowerSet.length; i < len; i++) {
-                                        d3.selectAll(lowerSet[i]).classed("histogram", false);
+                                        d3.select(lowerSet[i]).classed("histogram", false);
                                 }
                         });
 
@@ -344,9 +351,9 @@
                 var upperSet = [];
                 for (var i = 0, len = dataset.length; i < len; i++) {
                         if (dataset[i].value < sortMedian) {
-                                lowerSet.push(".rect" + String(dataset[i].sensor));
+                                lowerSet.push(".Brect" + String(dataset[i].sensor));
                         } else {
-                                upperSet.push(".rect" + String(dataset[i].sensor));
+                                upperSet.push(".Brect" + String(dataset[i].sensor));
                         }
                 }
 
@@ -409,20 +416,20 @@
                                 var diff = pos[1] - medianY;
                                 if (diff < 0) { // upper half
                                         for (var i = 0, len = upperSet.length; i < len; i++) {
-                                                d3.selectAll(upperSet[i]).classed("histogram", true);
+                                                d3.select(upperSet[i]).classed("histogram", true);
                                         }
                                 } else { // lower half
                                         for (var i = 0, len = lowerSet.length; i < len; i++) {
-                                                d3.selectAll(lowerSet[i]).classed("histogram", true);
+                                                d3.select(lowerSet[i]).classed("histogram", true);
                                         }
                                 }
                         })
                         .on("mouseout", function(d) {
                                 for (var i = 0, len = upperSet.length; i < len; i++) {
-                                        d3.selectAll(upperSet[i]).classed("histogram", false);
+                                        d3.select(upperSet[i]).classed("histogram", false);
                                 }
                                 for (var i = 0, len = lowerSet.length; i < len; i++) {
-                                        d3.selectAll(lowerSet[i]).classed("histogram", false);
+                                        d3.select(lowerSet[i]).classed("histogram", false);
                                 }
                         });
 
@@ -598,16 +605,7 @@
         /********** Graph callback **********/
         var graphCallbackOne = function(error, data) {
                 data_loaded[0] = true;
-                // var colorScale = d3.scale.quantile()
-                //         .domain([d3.min(data, function(d) {
-                //                         return d.value;
-                //                 }),
-                //                 buckets - 1,
-                //                 d3.max(data, function(d) {
-                //                         return d.value;
-                //                 })
-                //         ])
-                //         .range(colors);
+
                 var colorScale = d3.scale.quantile()
                         .domain([15, 950]) //global min and max values from CSV file
                         .range(colors);
@@ -634,7 +632,7 @@
                         .attr("ry", 4)
                         .attr("class", function(d) {
                                 classStr = "hour bordered ";
-                                classStr += "rect" + String(d.point.sensor);
+                                classStr += "Arect" + String(d.point.sensor);
                                 return classStr;
                         })
                         .attr("width", gridSize)
@@ -736,7 +734,7 @@
                         .attr("ry", 4)
                         .attr("class", function(d) {
                                 classStr = "hour bordered ";
-                                classStr += "rect" + String(d.point.sensor);
+                                classStr += "Brect" + String(d.point.sensor);
                                 return classStr;
                         })
                         .attr("width", gridSize)
